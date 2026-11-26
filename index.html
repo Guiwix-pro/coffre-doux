@@ -10,76 +10,14 @@
   <meta id="meta-theme-color" name="theme-color" content="#0E0E10" />
   <title>Coffre-Doux — Suivi Financier Éditorial</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%230E0E10'/%3E%3Crect x='11' y='11' width='42' height='42' rx='13' fill='none' stroke='%23E28E76' stroke-width='2.6'/%3E%3Ctext x='27' y='37' text-anchor='middle' font-family='Georgia, serif' font-size='22' fill='%23E28E76'%3EC%3C/text%3E%3Ctext x='38' y='43' text-anchor='middle' font-family='Georgia, serif' font-size='22' fill='%23E28E76'%3ED%3C/text%3E%3C/svg%3E" />
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230E0E10'/%3E%3Crect x='30' y='30' width='120' height='120' rx='36' fill='none' stroke='%23E28E76' stroke-width='6'/%3E%3Ctext x='76' y='105' text-anchor='middle' font-family='Georgia, serif' font-size='64' fill='%23E28E76'%3EC%3C/text%3E%3Ctext x='108' y='122' text-anchor='middle' font-family='Georgia, serif' font-size='64' fill='%23E28E76'%3ED%3C/text%3E%3C/svg%3E" />
-  <link id="pwa-manifest" rel="manifest" />
+  <link rel="apple-touch-icon" href="https://placehold.co/180x180/0E0E10/E28E76.png?text=CD" />
+  <link rel="manifest" href="./manifest.json" />
   <script>
-    // Génération d'une icône PNG 512x512 et d'un manifeste Data URI 100% compatible Android Chrome PWA
-    (function() {
-      try {
-        const canvas = document.createElement('canvas');
-        canvas.width = 512;
-        canvas.height = 512;
-        const ctx = canvas.getContext('2d');
-
-        // Fond sombre éditorial
-        ctx.fillStyle = '#0E0E10';
-        ctx.fillRect(0, 0, 512, 512);
-
-        // Cadre arrondi terracotta
-        ctx.strokeStyle = '#E28E76';
-        ctx.lineWidth = 18;
-        ctx.beginPath();
-        if (ctx.roundRect) {
-          ctx.roundRect(84, 84, 344, 344, 96);
-        } else {
-          ctx.rect(84, 84, 344, 344);
-        }
-        ctx.stroke();
-
-        // Monogramme CD
-        ctx.fillStyle = '#E28E76';
-        ctx.font = '500 175px Georgia, serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('C', 216, 240);
-        ctx.fillText('D', 304, 288);
-
-        const pngDataUrl = canvas.toDataURL('image/png');
-        const pageUrl = window.location.href.split('#')[0].split('?')[0];
-
-        const manifest = {
-          name: "Coffre-Doux",
-          short_name: "Coffre-Doux",
-          description: "Suivi financier éditorial et rassurant",
-          start_url: pageUrl,
-          scope: pageUrl.substring(0, pageUrl.lastIndexOf('/') + 1),
-          display: "standalone",
-          orientation: "portrait",
-          background_color: "#0E0E10",
-          theme_color: "#0E0E10",
-          icons: [
-            {
-              src: pngDataUrl,
-              sizes: "192x192",
-              type: "image/png",
-              purpose: "any"
-            },
-            {
-              src: pngDataUrl,
-              sizes: "512x512",
-              type: "image/png",
-              purpose: "any"
-            }
-          ]
-        };
-
-        const manifestDataUrl = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
-        const manifestEl = document.getElementById('pwa-manifest');
-        if (manifestEl) {
-          manifestEl.setAttribute('href', manifestDataUrl);
-        }
-      } catch (e) {}
-    })();
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
