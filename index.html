@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta id="meta-theme-color" name="theme-color" content="#0E0E10" />
+  <title>Coffre-Doux — Suivi Financier Éditorial</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%230E0E10'/%3E%3Crect x='11' y='11' width='42' height='42' rx='13' fill='none' stroke='%23E28E76' stroke-width='2.6'/%3E%3Ctext x='27' y='37' text-anchor='middle' font-family='Georgia, serif' font-size='22' fill='%23E28E76'%3EC%3C/text%3E%3Ctext x='38' y='43' text-anchor='middle' font-family='Georgia, serif' font-size='22' fill='%23E28E76'%3ED%3C/text%3E%3C/svg%3E" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            serif: ['Playfair Display', 'Georgia', 'serif'],
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    /* =========================================================================
+       VARIABLES THÈME — MINIMALISME ÉDITORIAL (MODE NUIT & MODE JOUR)
+       ========================================================================= */
+    :root {
+      --bg-outer: #EAE6DF;
+      --bg-app: #F8F6F1;
+      --bg-surface: #FFFFFF;
+      --bg-surface-alt: #F1EDE4;
+      --bg-glass: rgba(248, 246, 241, 0.92);
+      --bg-input: #FFFFFF;
+      --border-subtle: #E6E2D8;
+      --border-strong: #CFC9BC;
+      --text-primary: #18181B;
+      --text-secondary: #57534E;
+      --text-muted: #8C857B;
+      --accent: #18181B;
+      --accent-text: #F8F6F1;
+      --warm-accent: #C86D51;
+      --positive: #2E7D5B;
+      --negative: #C85A53;
+      --donut-track: #ECE8DF;
+    }
+
+    html.dark {
+      --bg-outer: #070708;
+      --bg-app: #0E0E10;
+      --bg-surface: #16161A;
+      --bg-surface-alt: #1E1E24;
+      --bg-glass: rgba(14, 14, 16, 0.92);
+      --bg-input: #16161A;
+      --border-subtle: #27272F;
+      --border-strong: #3A3A46;
+      --text-primary: #F4F4F5;
+      --text-secondary: #9CA3AF;
+      --text-muted: #6B7280;
+      --accent: #F4F4F5;
+      --accent-text: #0E0E10;
+      --warm-accent: #E28E76;
+      --positive: #6EE7B7;
+      --negative: #FCA5A5;
+      --donut-track: #23232B;
+    }
+
+    body {
+      background-color: var(--bg-outer);
+      color: var(--text-primary);
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    #app-shell {
+      background-color: var(--bg-app);
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    /* Grain éditorial ultra-discret en arrière-plan */
+    #app-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.03;
+      background-image: radial-gradient(var(--text-primary) 0.5px, transparent 0.5px);
+      background-size: 18px 18px;
+      z-index: 0;
+    }
+
+    .ed-surface {
+      background-color: var(--bg-surface);
+      border-color: var(--border-subtle);
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .ed-surface-alt {
+      background-color: var(--bg-surface-alt);
+      border-color: var(--border-subtle);
+    }
+
+    .ed-surface-interactive:hover {
+      background-color: var(--bg-surface-alt);
+    }
+
+    .ed-glass {
+      background-color: var(--bg-glass);
+      border-color: var(--border-subtle);
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .ed-input {
+      background-color: var(--bg-input);
+      border-color: var(--border-subtle);
+      color: var(--text-primary);
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .ed-input:focus {
+      outline: none;
+      border-color: var(--border-strong);
+    }
+
+    .ed-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .ed-btn-primary {
+      background-color: var(--accent);
+      color: var(--accent-text);
+    }
+
+    .ed-text-primary { color: var(--text-primary); }
+    .ed-text-secondary { color: var(--text-secondary); }
+    .ed-text-muted { color: var(--text-muted); }
+    .ed-warm-accent { color: var(--warm-accent); }
+    .ed-border { border-color: var(--border-subtle); }
+    .ed-positive { color: var(--positive); }
+    .ed-negative { color: var(--negative); }
+
+    /* Barres de défilement masquées */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    @keyframes splashOut {
+      from { opacity: 1; transform: scale(1); }
+      to { opacity: 0; transform: scale(1.02); }
+    }
+    @keyframes haloPulse {
+      0%, 100% { opacity: 0.45; transform: scale(0.96); }
+      50% { opacity: 0.78; transform: scale(1.04); }
+    }
+    .animate-fade-in { animation: fadeIn 0.25s ease-out forwards; }
+    .animate-slide-up { animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .animate-splash-out { animation: splashOut 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    .animate-halo { animation: haloPulse 6s ease-in-out infinite; }
+
+    button, input, select, textarea {
+      -webkit-tap-highlight-color: transparent;
+    }
+  </style>
+  <script>
+    // Mode Nuit par défaut (#0E0E10), bascule immédiate si 'light' enregistré
+    (function() {
+      try {
+        const saved = localStorage.getItem('monespace_finance_theme');
+        if (saved === 'light') {
+          document.documentElement.classList.remove('dark');
+        } else {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body class="font-sans antialiased min-h-screen flex justify-center items-center sm:p-4">
+
+  <!-- Conteneur Mobile-First -->
+  <div id="app-shell" class="relative w-full sm:max-w-[430px] h-screen sm:h-[850px] sm:rounded-[2.25rem] sm:shadow-2xl sm:border ed-border flex flex-col overflow-hidden">
+
+    <!-- =====================================================================
+         1. ÉCRAN DE BIENVENUE (SPLASH / ONBOARDING D'ENTRÉE)
+         ===================================================================== -->
+    <div id="welcome-screen" style="background-color: var(--bg-app);" class="hidden absolute inset-0 z-50 flex flex-col justify-between p-8 overflow-hidden select-none">
+      <!-- Formes organiques abstraites en haut à droite -->
+      <div class="pointer-events-none absolute -top-12 -right-12 w-72 h-72 opacity-90">
+        <svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+          <defs>
+            <linearGradient id="organicGrad1" x1="20" y1="10" x2="280" y2="260" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#F2B8A2" stop-opacity="0.75" />
+              <stop offset="55%" stop-color="#D97B66" stop-opacity="0.65" />
+              <stop offset="100%" stop-color="#8B4A58" stop-opacity="0.45" />
+            </linearGradient>
+            <linearGradient id="organicGrad2" x1="60" y1="0" x2="290" y2="220" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#E8A598" stop-opacity="0.5" />
+              <stop offset="100%" stop-color="#C86D51" stop-opacity="0.3" />
+            </linearGradient>
+          </defs>
+          <path d="M90,-20 C140,45 190,35 235,85 C280,135 265,215 320,250 L320,-20 Z" fill="url(#organicGrad1)" />
+          <path d="M135,-10 C175,55 215,65 245,120 C275,175 245,235 310,275 L310,-10 Z" fill="url(#organicGrad2)" />
+        </svg>
+      </div>
+
+      <!-- Haut discret : logo Coffre-Doux + bouton thème disponible dès l'accueil -->
+      <div class="relative z-10 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <svg class="w-8 h-8 shrink-0" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="4" y="4" width="40" height="40" rx="12" stroke="var(--warm-accent)" stroke-width="1.8" />
+            <text x="20" y="28.5" text-anchor="middle" font-family="'Playfair Display', Georgia, serif" font-size="18.5" font-weight="500" fill="var(--warm-accent)">C</text>
+            <text x="29" y="33.5" text-anchor="middle" font-family="'Playfair Display', Georgia, serif" font-size="18.5" font-weight="500" fill="var(--warm-accent)">D</text>
+          </svg>
+        </div>
+
+        <button
+          onclick="toggleTheme()"
+          aria-label="Changer le thème"
+          class="w-9 h-9 rounded-full ed-surface border ed-border flex items-center justify-center ed-text-secondary hover:ed-text-primary transition-colors"
+        >
+          <svg class="w-4 h-4 dark:block hidden" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <svg class="w-4 h-4 dark:hidden block" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Centre / Bas gauche : Salutation éditoriale & texte -->
+      <div class="relative z-10 my-auto pt-24 pr-4">
+        <p id="welcome-greeting" class="text-xs uppercase tracking-[0.26em] font-semibold ed-warm-accent mb-3">
+          HELLO
+        </p>
+        <h2 class="font-serif text-[2rem] leading-[1.18] font-normal ed-text-primary mb-5">
+          Bienvenue sur votre Coffre Doux.
+        </h2>
+        <p class="text-sm leading-relaxed ed-text-secondary font-light max-w-[290px]">
+          Suivez vos dépenses, vos revenus et gardez le contrôle de votre budget au quotidien, en toute simplicité.
+        </p>
+      </div>
+
+      <!-- Bas droite : Bouton CONTINUER -->
+      <div class="relative z-10 flex items-center justify-end pt-4">
+        <button
+          onclick="dismissWelcomeScreen()"
+          class="group inline-flex items-center gap-2 text-xs uppercase tracking-[0.22em] font-semibold ed-warm-accent py-3 px-2 hover:opacity-80 active:scale-95 transition-all"
+        >
+          <span>CONTINUER</span>
+          <span class="transition-transform group-hover:translate-x-1">→</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- =====================================================================
+         2. EN-TÊTE SUPÉRIEUR MINIMALISTE
+         ===================================================================== -->
+    <header class="relative z-10 ed-glass backdrop-blur-md px-5 pt-5 pb-3 flex items-center justify-between shrink-0 border-b ed-border">
+      <div class="flex items-center gap-3">
+        <!-- Logo Coffre-Doux cliquable pour revenir à l'Accueil -->
+        <button
+          onclick="switchTab('home')"
+          aria-label="Retour à l'accueil"
+          title="Retour à l'accueil"
+          class="rounded-xl p-0.5 -m-0.5 hover:opacity-80 active:scale-95 transition-all cursor-pointer"
+        >
+          <svg class="w-9 h-9 shrink-0" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="4" y="4" width="40" height="40" rx="12" stroke="var(--warm-accent)" stroke-width="1.75" />
+            <text x="20" y="28.5" text-anchor="middle" font-family="'Playfair Display', Georgia, serif" font-size="18.5" font-weight="500" fill="var(--warm-accent)">C</text>
+            <text x="29" y="33.5" text-anchor="middle" font-family="'Playfair Display', Georgia, serif" font-size="18.5" font-weight="500" fill="var(--warm-accent)">D</text>
+          </svg>
+        </button>
+
+        <div>
+          <h1 id="header-title" class="font-serif text-xl font-medium ed-text-primary tracking-tight">Accueil</h1>
+        </div>
+      </div>
+
+      <!-- Bouton Bascule Mode Nuit / Mode Jour -->
+      <button
+        id="theme-toggle-btn"
+        onclick="toggleTheme()"
+        aria-label="Basculer Mode Nuit / Mode Jour"
+        title="Mode Nuit / Jour"
+        class="w-9 h-9 rounded-full ed-surface border ed-border flex items-center justify-center ed-text-secondary hover:ed-text-primary active:scale-95 transition-all"
+      >
+        <svg id="icon-sun" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+        <svg id="icon-moon" class="hidden w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+      </button>
+    </header>
+
+    <!-- =====================================================================
+         3. ZONE DE CONTENU PRINCIPAL DYNAMIQUE (ACCUEIL / FINANCE / PLUS)
+         ===================================================================== -->
+    <main id="main-content" class="relative z-10 flex-1 overflow-y-auto no-scrollbar px-5 pt-4 pb-24">
+      <!-- Contenu injecté dynamiquement par renderActiveView() -->
+    </main>
+
+    <!-- =====================================================================
+         4. BARRE DE NAVIGATION INFÉRIEURE (2 ONGLETS ÉPURÉS)
+         ===================================================================== -->
+    <nav class="absolute bottom-0 inset-x-0 z-20 ed-glass backdrop-blur-md border-t ed-border px-6 py-2.5 flex justify-around items-center">
+      <button onclick="switchTab('finance')" id="nav-finance" class="nav-btn flex flex-col items-center justify-center w-28 py-1 transition-all">
+        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18h18M7 15l4-4 3 3 5-6" />
+        </svg>
+        <span class="text-[10px] tracking-wide font-medium">Finance</span>
+      </button>
+
+      <button onclick="switchTab('more')" id="nav-more" class="nav-btn flex flex-col items-center justify-center w-28 py-1 transition-all">
+        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
+        </svg>
+        <span class="text-[10px] tracking-wide font-medium">Plus</span>
+      </button>
+    </nav>
+
+    <!-- =====================================================================
+         5. MODALE (TIROIR INFÉRIEUR AJOUT / ÉDITION TRANSACTION)
+         ===================================================================== -->
+    <div id="modal-backdrop" onclick="closeModalOnBackdrop(event)" class="hidden fixed sm:absolute inset-0 z-40 bg-black/65 backdrop-blur-xs flex items-end justify-center">
+      <div id="modal-panel" class="w-full max-h-[90%] overflow-y-auto no-scrollbar rounded-t-3xl border-t ed-border p-6 shadow-2xl animate-slide-up" style="background-color: var(--bg-app);">
+        <!-- Contenu de la modale injecté ici -->
+      </div>
+    </div>
+
+    <!-- Toast discret -->
+    <div id="toast" class="pointer-events-none opacity-0 transition-opacity duration-300 fixed sm:absolute bottom-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full ed-surface border ed-border shadow-lg text-xs font-medium ed-text-primary whitespace-nowrap">
+      Enregistré
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. CONFIGURATION, CATÉGORIES & DONNÉES INITIALES (VIERGES)
+    // =========================================================================
+    const STORAGE_KEY = 'monespace_v3_clean';
+    const THEME_KEY = 'monespace_finance_theme';
+
+    const CATEGORIES = {
+      Courses: {
+        color: '#D97706',
+        icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />'
+      },
+      Logement: {
+        color: '#6366F1',
+        icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />'
+      },
+      Transport: {
+        color: '#0EA5E9',
+        icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M8 7h8m-8 5h8m-9 4h10a2 2 0 002-2V7a3 3 0 00-3-3H8a3 3 0 00-3 3v7a2 2 0 002 2zm0 0v2m10-2v2" />'
+      },
+      Loisirs: {
+        color: '#10B981',
+        icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />'
+      },
+      Santé: {
+        color: '#EC4899',
+        icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />'
+      },
+      Factures: {
+        color: '#F59E0B',
+        icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />'
+      },
+      Salaire: {
+        color: '#14B8A6',
+        icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />'
+      },
+      Autre: {
+        color: '#8B5CF6',
+        icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />'
+      }
+    };
+
+    function getCurrentMonthKey() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    function createCleanData() {
+      return {
+        userName: '',
+        showWelcomeOnOpen: true,
+        discreetMode: false,
+        soundEffects: true,
+        selectedMonth: getCurrentMonthKey(),
+        transactions: []
+      };
+    }
+
+    let state = loadState();
+    let activeTab = 'home';
+    let financeFilter = 'all';
+    let financeSearch = '';
+
+    // =========================================================================
+    // MICRO-SIGNATURE SONORE & HAPTIQUE (DÉCLIC FEUTRÉ D'ÉCRIN)
+    // =========================================================================
+    function playSoftChime(type = 'save') {
+      try {
+        if (navigator.vibrate) {
+          navigator.vibrate(type === 'toggle' ? 10 : 18);
+        }
+        if (!state.soundEffects) return;
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        const now = ctx.currentTime;
+        if (type === 'toggle') {
+          osc.frequency.setValueAtTime(340, now);
+          osc.frequency.exponentialRampToValueAtTime(420, now + 0.08);
+          gain.gain.setValueAtTime(0.03, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+        } else {
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.exponentialRampToValueAtTime(587.33, now + 0.14);
+          gain.gain.setValueAtTime(0.045, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+        }
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.24);
+      } catch (e) {}
+    }
+
+    function toggleDiscreetMode() {
+      state.discreetMode = !state.discreetMode;
+      saveState();
+      playSoftChime('toggle');
+      renderActiveView();
+      showToast(state.discreetMode ? 'Coffre refermé (montants masqués)' : 'Montants visibles');
+    }
+
+    function toggleSoundEffects() {
+      state.soundEffects = !state.soundEffects;
+      saveState();
+      if (state.soundEffects) playSoftChime('toggle');
+      renderActiveView();
+      showToast(state.soundEffects ? 'Signature sonore activée' : 'Signature sonore désactivée');
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          return {
+            ...createCleanData(),
+            ...parsed,
+            transactions: Array.isArray(parsed.transactions) ? parsed.transactions : []
+          };
+        }
+      } catch (e) {}
+      return createCleanData();
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {}
+    }
+
+    // =========================================================================
+    // 2. GESTION DU THÈME (MODE NUIT / MODE JOUR) & TOAST
+    // =========================================================================
+    function syncThemeUI() {
+      const isDark = document.documentElement.classList.contains('dark');
+      const iconSun = document.getElementById('icon-sun');
+      const iconMoon = document.getElementById('icon-moon');
+      const metaTheme = document.getElementById('meta-theme-color');
+
+      if (iconSun && iconMoon) {
+        iconSun.classList.toggle('hidden', !isDark);
+        iconMoon.classList.toggle('hidden', isDark);
+      }
+      if (metaTheme) {
+        metaTheme.setAttribute('content', isDark ? '#0E0E10' : '#F8F6F1');
+      }
+    }
+
+    function toggleTheme() {
+      const htmlEl = document.documentElement;
+      const willBeDark = !htmlEl.classList.contains('dark');
+      htmlEl.classList.toggle('dark', willBeDark);
+      try {
+        localStorage.setItem(THEME_KEY, willBeDark ? 'dark' : 'light');
+      } catch (e) {}
+      syncThemeUI();
+      if (activeTab === 'more') {
+        renderActiveView();
+      }
+    }
+
+    let toastTimer = null;
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.remove('opacity-0');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        el.classList.add('opacity-0');
+      }, 2400);
+    }
+
+    // =========================================================================
+    // 3. ÉCRAN DE BIENVENUE & NAVIGATION ENTRE ONGLETS
+    // =========================================================================
+    function updateWelcomeGreeting() {
+      const el = document.getElementById('welcome-greeting');
+      if (!el) return;
+      const name = (state.userName || '').trim();
+      el.textContent = name ? `HELLO, ${name.toUpperCase()}` : 'HELLO';
+    }
+
+    function showWelcomeScreen() {
+      const el = document.getElementById('welcome-screen');
+      if (!el) return;
+      updateWelcomeGreeting();
+      el.classList.remove('hidden', 'animate-splash-out');
+    }
+
+    function dismissWelcomeScreen() {
+      const el = document.getElementById('welcome-screen');
+      if (!el) return;
+      playSoftChime('toggle');
+      el.classList.add('animate-splash-out');
+      setTimeout(() => {
+        el.classList.add('hidden');
+        el.classList.remove('animate-splash-out');
+      }, 320);
+    }
+
+    function switchTab(tab) {
+      activeTab = tab;
+      const titles = {
+        home: 'Accueil',
+        finance: 'Finance',
+        more: 'Plus'
+      };
+      const headerTitle = document.getElementById('header-title');
+      if (headerTitle) {
+        headerTitle.textContent = titles[tab] || 'Accueil';
+      }
+
+      ['finance', 'more'].forEach(key => {
+        const btn = document.getElementById(`nav-${key}`);
+        if (!btn) return;
+        if (key === tab) {
+          btn.classList.add('ed-warm-accent');
+          btn.classList.remove('ed-text-muted');
+        } else {
+          btn.classList.remove('ed-warm-accent');
+          btn.classList.add('ed-text-muted');
+        }
+      });
+
+      renderActiveView();
+    }
+
+    function renderActiveView() {
+      const container = document.getElementById('main-content');
+      if (!container) return;
+      if (activeTab === 'home') {
+        container.innerHTML = renderHomeView();
+      } else if (activeTab === 'finance') {
+        container.innerHTML = renderFinanceView();
+      } else if (activeTab === 'more') {
+        container.innerHTML = renderMoreView();
+      }
+    }
+
+    // =========================================================================
+    // 4. UTILITAIRES DE FORMATAGE & CALCULS FINANCIERS
+    // =========================================================================
+    function formatCurrency(amount, allowMask = true) {
+      if (allowMask && state.discreetMode) {
+        return '•••• €';
+      }
+      const num = Number(amount || 0);
+      const isNeg = num < 0;
+      const absParts = Math.abs(num).toFixed(2).split('.');
+      const intPart = absParts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+      return `${isNeg ? '-' : ''}${intPart},${absParts[1]} €`;
+    }
+
+    function getFinancialWeather(metrics) {
+      if (metrics.list.length === 0) {
+        return {
+          quote: '« Votre coffre est prêt à accueillir vos premiers projets. »',
+          glowColor: 'rgba(226, 142, 118, 0.22)'
+        };
+      }
+      if (metrics.balance > 0) {
+        return {
+          quote: '« Tout est calme et au chaud. »',
+          glowColor: 'rgba(226, 142, 118, 0.28)'
+        };
+      }
+      if (metrics.balance === 0) {
+        return {
+          quote: '« Équilibre parfait, tout est à sa place. »',
+          glowColor: 'rgba(226, 142, 118, 0.20)'
+        };
+      }
+      return {
+        quote: '« On garde le cap tout en douceur. »',
+        glowColor: 'rgba(200, 90, 83, 0.22)'
+      };
+    }
+
+    function buildHorizonLineSVG(monthTransactions) {
+      const sorted = [...monthTransactions].sort((a, b) => a.date.localeCompare(b.date));
+      let points = [];
+      if (sorted.length === 0) {
+        points = [50, 50, 49, 50, 50];
+      } else {
+        let running = 0;
+        const rawVals = [0];
+        sorted.forEach(tx => {
+          running += tx.type === 'income' ? Number(tx.amount) : -Number(tx.amount);
+          rawVals.push(running);
+        });
+        if (rawVals.length === 2) rawVals.unshift(0);
+        const min = Math.min(...rawVals);
+        const max = Math.max(...rawVals);
+        const span = max - min || 1;
+        points = rawVals.map(v => 74 - ((v - min) / span) * 48);
+      }
+
+      const width = 320;
+      const step = width / (points.length - 1);
+      const coords = points.map((y, idx) => ({ x: idx * step, y }));
+
+      let d = `M ${coords[0].x.toFixed(1)} ${coords[0].y.toFixed(1)}`;
+      for (let i = 0; i < coords.length - 1; i++) {
+        const cx = ((coords[i].x + coords[i + 1].x) / 2).toFixed(1);
+        d += ` Q ${cx} ${coords[i].y.toFixed(1)}, ${cx} ${((coords[i].y + coords[i + 1].y) / 2).toFixed(1)}`;
+        d += ` T ${coords[i + 1].x.toFixed(1)} ${coords[i + 1].y.toFixed(1)}`;
+      }
+      const areaD = `${d} L ${width} 90 L 0 90 Z`;
+
+      return `
+        <div class="mt-3 pt-1">
+          <svg viewBox="0 0 320 88" class="w-full h-14 overflow-visible" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="horizonFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--warm-accent)" stop-opacity="0.22" />
+                <stop offset="100%" stop-color="var(--warm-accent)" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+            <path d="${areaD}" fill="url(#horizonFill)" />
+            <path d="${d}" fill="none" stroke="var(--warm-accent)" stroke-width="1.75" stroke-linecap="round" />
+            <circle cx="${coords[coords.length - 1].x.toFixed(1)}" cy="${coords[coords.length - 1].y.toFixed(1)}" r="3.2" fill="var(--warm-accent)" />
+          </svg>
+        </div>
+      `;
+    }
+
+    function formatMonthLabel(monthKey) {
+      if (!monthKey || !monthKey.includes('-')) return '';
+      const [y, m] = monthKey.split('-').map(Number);
+      const d = new Date(y, m - 1, 1);
+      const label = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+      return label.charAt(0).toUpperCase() + label.slice(1);
+    }
+
+    function formatShortDate(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('-');
+      if (parts.length !== 3) return dateStr;
+      return `${parts[2]}/${parts[1]}`;
+    }
+
+    function escapeHTML(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function getMonthMetrics(monthKey) {
+      const list = state.transactions
+        .filter(t => t.date && t.date.startsWith(monthKey))
+        .sort((a, b) => b.date.localeCompare(a.date));
+
+      let income = 0;
+      let expense = 0;
+      list.forEach(t => {
+        const val = Number(t.amount) || 0;
+        if (t.type === 'income') income += val;
+        else expense += val;
+      });
+
+      return {
+        list,
+        income,
+        expense,
+        balance: income - expense
+      };
+    }
+
+    function getCategoryIconHTML(category, isIncome) {
+      const cat = CATEGORIES[category] || CATEGORIES.Autre;
+      const strokeColor = isIncome ? 'var(--positive)' : cat.color;
+      return `
+        <div class="w-10 h-10 rounded-xl ed-surface-alt border ed-border flex items-center justify-center shrink-0" style="color: ${strokeColor};">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+            ${cat.icon}
+          </svg>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 6. VUE 1 : PAGE D'ACCUEIL DÉDIÉE AUX FINANCES
+    // =========================================================================
+    function renderHomeView() {
+      const metrics = getMonthMetrics(state.selectedMonth);
+      const recentTransactions = metrics.list.slice(0, 4);
+      const weather = getFinancialWeather(metrics);
+
+      return `
+        <div class="space-y-7 animate-fade-in">
+          <!-- BLOC SOLDE PRINCIPAL (MÉTÉO ÉDITORIALE + MODE DISCRÉTION + LIGNE D'HORIZON) -->
+          <section class="relative pb-6 border-b ed-border">
+            <div class="flex items-center justify-between mb-1">
+              <div class="flex items-center gap-2">
+                <span class="text-[11px] uppercase tracking-[0.22em] ed-text-secondary font-medium">SOLDE ACTUEL</span>
+                <button
+                  onclick="toggleDiscreetMode()"
+                  aria-label="${state.discreetMode ? 'Afficher les montants' : 'Masquer les montants'}"
+                  title="${state.discreetMode ? 'Afficher les montants' : 'Mode Discrétion'}"
+                  class="w-6 h-6 rounded-full flex items-center justify-center ed-text-secondary hover:ed-warm-accent transition-colors"
+                >
+                  ${state.discreetMode ? `
+                    <svg class="w-3.5 h-3.5 ed-warm-accent" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                    </svg>
+                  ` : `
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  `}
+                </button>
+              </div>
+              <button onclick="switchTab('finance')" class="text-[11px] ed-text-muted hover:ed-text-primary transition-colors">
+                ${formatMonthLabel(state.selectedMonth)} →
+              </button>
+            </div>
+
+            <!-- Halo chaleureux & Montant -->
+            <div onclick="switchTab('finance')" class="relative cursor-pointer py-1">
+              <div
+                class="pointer-events-none absolute -inset-x-4 -inset-y-2 rounded-full blur-2xl animate-halo"
+                style="background: radial-gradient(circle, ${weather.glowColor} 0%, transparent 72%);"
+              ></div>
+
+              <p class="relative font-serif text-[2.75rem] leading-tight font-normal tracking-tight ${state.discreetMode ? 'ed-warm-accent tracking-widest' : 'ed-text-primary'}">
+                ${formatCurrency(metrics.balance)}
+              </p>
+              <p class="relative text-xs ed-text-secondary mt-0.5">
+                ${state.discreetMode ? 'Montants protégés par le Mode Discrétion' : 'Disponible ce mois'}
+              </p>
+              <p class="relative font-serif italic text-sm ed-warm-accent mt-2.5">
+                ${weather.quote}
+              </p>
+            </div>
+
+            <!-- Ligne d'Horizon (Courbe d'évolution minimaliste) -->
+            ${buildHorizonLineSVG(metrics.list)}
+
+            <!-- Résumé discret Revenus / Dépenses -->
+            <div class="flex items-center gap-5 mt-3 pt-3.5 border-t ed-border text-xs">
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full" style="background-color: var(--positive);"></span>
+                <span class="ed-text-muted">Revenus</span>
+                <span class="font-medium ed-positive">${state.discreetMode ? '•••• €' : '+' + formatCurrency(metrics.income, false)}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full" style="background-color: var(--negative);"></span>
+                <span class="ed-text-muted">Dépenses</span>
+                <span class="font-medium ed-negative">${state.discreetMode ? '•••• €' : '-' + formatCurrency(metrics.expense, false)}</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- BOUTONS D'AJOUT RAPIDE -->
+          <section class="pb-6 border-b ed-border">
+            <h2 class="text-[11px] uppercase tracking-[0.22em] ed-text-secondary font-medium mb-3.5">AJOUT RAPIDE</h2>
+            <div class="grid grid-cols-2 gap-3">
+              <button
+                onclick="openTransactionModal('expense')"
+                class="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl ed-surface ed-surface-interactive border ed-border text-sm font-medium ed-text-primary active:scale-[0.98] transition-all"
+              >
+                <span class="text-base leading-none ed-negative">+</span>
+                <span>Dépense</span>
+              </button>
+
+              <button
+                onclick="openTransactionModal('income')"
+                class="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl ed-surface ed-surface-interactive border ed-border text-sm font-medium ed-text-primary active:scale-[0.98] transition-all"
+              >
+                <span class="text-base leading-none ed-positive">+</span>
+                <span>Recette</span>
+              </button>
+            </div>
+          </section>
+
+          <!-- DERNIÈRES OPÉRATIONS -->
+          <section>
+            <div class="flex items-center justify-between mb-3.5">
+              <h2 class="text-[11px] uppercase tracking-[0.22em] ed-text-secondary font-medium">DERNIÈRES OPÉRATIONS</h2>
+              <button onclick="switchTab('finance')" class="text-xs ed-text-secondary hover:ed-text-primary transition-colors">
+                Tout voir →
+              </button>
+            </div>
+
+            ${recentTransactions.length > 0 ? `
+              <div class="space-y-2.5">
+                ${recentTransactions.map(tx => {
+                  const isInc = tx.type === 'income';
+                  return `
+                    <article
+                      onclick="openTransactionModal('${tx.type}', '${tx.id}')"
+                      class="flex items-center justify-between gap-3 p-3 rounded-2xl ed-surface ed-surface-interactive border ed-border cursor-pointer active:scale-[0.99] transition-all"
+                    >
+                      <div class="flex items-center gap-3 min-w-0">
+                        ${getCategoryIconHTML(tx.category, isInc)}
+                        <div class="min-w-0">
+                          <h3 class="text-sm font-medium ed-text-primary truncate">${escapeHTML(tx.title)}</h3>
+                          <p class="text-[11px] ed-text-muted mt-0.5">${escapeHTML(tx.category)} · ${formatShortDate(tx.date)}</p>
+                        </div>
+                      </div>
+                      <span class="font-serif text-[15px] font-medium shrink-0 ${isInc ? 'ed-positive' : 'ed-negative'}">
+                        ${state.discreetMode ? '•••• €' : (isInc ? '+' : '-') + formatCurrency(tx.amount, false)}
+                      </span>
+                    </article>
+                  `;
+                }).join('')}
+              </div>
+            ` : `
+              <div class="text-center py-9 px-5 rounded-2xl ed-surface border ed-border">
+                <!-- Sceau éditorial Coffre-Doux pour état vide -->
+                <div class="w-12 h-12 mx-auto mb-3 rounded-full ed-surface-alt border ed-border flex items-center justify-center">
+                  <svg class="w-6 h-6 ed-warm-accent" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="5" y="8" width="22" height="17" rx="5" />
+                    <path d="M5 15h22" />
+                    <path d="M16 17.2c-.8-1-2.3-.8-2.3.5 0 1.2 2.3 2.5 2.3 2.5s2.3-1.3 2.3-2.5c0-1.3-1.5-1.5-2.3-.5z" />
+                  </svg>
+                </div>
+                <p class="font-serif italic text-base ed-text-primary">Votre coffre est encore tout neuf.</p>
+                <p class="text-[11px] ed-text-muted mt-1.5 max-w-[240px] mx-auto leading-relaxed">
+                  Ajoutez votre première dépense ou recette ci-dessus pour voir votre horizon prendre vie.
+                </p>
+              </div>
+            `}
+          </section>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 7. VUE 2 : ONGLET FINANCE (SUIVI D'ARGENT COMPLET)
+    // =========================================================================
+    function changeMonth(delta) {
+      const [y, m] = state.selectedMonth.split('-').map(Number);
+      const d = new Date(y, m - 1 + delta, 1);
+      state.selectedMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      saveState();
+      renderActiveView();
+    }
+
+    function setFinanceFilter(filter) {
+      financeFilter = filter;
+      renderActiveView();
+    }
+
+    function updateFinanceSearch(val) {
+      financeSearch = val;
+      renderActiveView();
+      const inp = document.getElementById('finance-search-input');
+      if (inp) {
+        inp.focus();
+        inp.setSelectionRange(val.length, val.length);
+      }
+    }
+
+    function buildDonutSVG(expensesList, totalExpense) {
+      if (totalExpense <= 0) {
+        return `
+          <svg viewBox="0 0 120 120" class="w-28 h-28 shrink-0">
+            <circle cx="60" cy="60" r="46" fill="none" stroke="var(--donut-track)" stroke-width="11" />
+            <text x="60" y="64" text-anchor="middle" fill="var(--text-muted)" font-size="11">0,00 €</text>
+          </svg>
+        `;
+      }
+
+      const totalsByCat = {};
+      expensesList.forEach(t => {
+        totalsByCat[t.category] = (totalsByCat[t.category] || 0) + Number(t.amount);
+      });
+
+      const radius = 46;
+      const circumference = 2 * Math.PI * radius;
+      let offset = 0;
+
+      const segments = Object.entries(totalsByCat)
+        .sort((a, b) => b[1] - a[1])
+        .map(([cat, val]) => {
+          const pct = val / totalExpense;
+          const dash = pct * circumference;
+          const color = (CATEGORIES[cat] && CATEGORIES[cat].color) || '#8B5CF6';
+          const circle = `
+            <circle
+              cx="60" cy="60" r="${radius}"
+              fill="none"
+              stroke="${color}"
+              stroke-width="11"
+              stroke-dasharray="${dash} ${circumference - dash}"
+              stroke-dashoffset="${-offset}"
+              transform="rotate(-90 60 60)"
+            />
+          `;
+          offset += dash;
+          return circle;
+        }).join('');
+
+      return `
+        <svg viewBox="0 0 120 120" class="w-28 h-28 shrink-0">
+          <circle cx="60" cy="60" r="${radius}" fill="none" stroke="var(--donut-track)" stroke-width="11" />
+          ${segments}
+          <text x="60" y="56" text-anchor="middle" fill="var(--text-muted)" font-size="8.5" letter-spacing="1.2">DÉPENSES</text>
+          <text x="60" y="71" text-anchor="middle" fill="var(--text-primary)" font-size="12.5" font-weight="600">${Math.round(totalExpense)} €</text>
+        </svg>
+      `;
+    }
+
+    function renderFinanceView() {
+      const metrics = getMonthMetrics(state.selectedMonth);
+      const expensesOnly = metrics.list.filter(t => t.type === 'expense');
+
+      const q = financeSearch.trim().toLowerCase();
+      const filteredList = metrics.list.filter(t => {
+        const matchType =
+          financeFilter === 'all' ||
+          (financeFilter === 'expense' && t.type === 'expense') ||
+          (financeFilter === 'income' && t.type === 'income');
+
+        const matchQuery =
+          !q ||
+          t.title.toLowerCase().includes(q) ||
+          t.category.toLowerCase().includes(q) ||
+          (t.note && t.note.toLowerCase().includes(q));
+
+        return matchType && matchQuery;
+      });
+
+      const totalsByCat = {};
+      expensesOnly.forEach(t => {
+        totalsByCat[t.category] = (totalsByCat[t.category] || 0) + Number(t.amount);
+      });
+      const legendItems = Object.entries(totalsByCat).sort((a, b) => b[1] - a[1]);
+
+      return `
+        <div class="space-y-6 animate-fade-in">
+          <!-- Sélecteur de mois + bouton Nouvelle opération -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <button onclick="changeMonth(-1)" aria-label="Mois précédent" class="w-8 h-8 rounded-full ed-surface border ed-border flex items-center justify-center ed-text-secondary hover:ed-text-primary transition-colors">‹</button>
+              <span class="font-serif text-base font-medium ed-text-primary min-w-[132px] text-center">${formatMonthLabel(state.selectedMonth)}</span>
+              <button onclick="changeMonth(1)" aria-label="Mois suivant" class="w-8 h-8 rounded-full ed-surface border ed-border flex items-center justify-center ed-text-secondary hover:ed-text-primary transition-colors">›</button>
+            </div>
+            <button onclick="openTransactionModal('expense')" class="ed-btn-primary text-xs font-medium px-3.5 py-2 rounded-full active:scale-95 transition-transform">
+              + Ajouter
+            </button>
+          </div>
+
+          <!-- Cartes récapitulatives du mois -->
+          <div class="grid grid-cols-3 gap-2.5">
+            <div class="p-3 rounded-2xl ed-surface border ed-border">
+              <span class="text-[10px] uppercase tracking-wider ed-text-muted block">Revenus</span>
+              <span class="font-serif text-sm font-medium ed-positive mt-1 block">${state.discreetMode ? '•••• €' : '+' + formatCurrency(metrics.income, false)}</span>
+            </div>
+            <div class="p-3 rounded-2xl ed-surface border ed-border">
+              <span class="text-[10px] uppercase tracking-wider ed-text-muted block">Dépenses</span>
+              <span class="font-serif text-sm font-medium ed-negative mt-1 block">${state.discreetMode ? '•••• €' : '-' + formatCurrency(metrics.expense, false)}</span>
+            </div>
+            <div class="p-3 rounded-2xl ed-surface border ed-border">
+              <span class="text-[10px] uppercase tracking-wider ed-text-muted block">Reste</span>
+              <span class="font-serif text-sm font-medium ed-text-primary mt-1 block">${formatCurrency(metrics.balance)}</span>
+            </div>
+          </div>
+
+          <!-- Graphique circulaire SVG de répartition -->
+          <section class="p-4 rounded-2xl ed-surface border ed-border">
+            <h2 class="text-[11px] uppercase tracking-[0.2em] ed-text-secondary font-medium mb-3.5">RÉPARTITION PAR CATÉGORIE</h2>
+            <div class="flex items-center gap-4">
+              ${buildDonutSVG(expensesOnly, metrics.expense)}
+              <div class="flex-1 space-y-2">
+                ${legendItems.length > 0 ? legendItems.map(([cat, val]) => {
+                  const pct = metrics.expense > 0 ? Math.round((val / metrics.expense) * 100) : 0;
+                  const color = (CATEGORIES[cat] && CATEGORIES[cat].color) || '#8B5CF6';
+                  return `
+                    <div class="flex items-center justify-between text-xs">
+                      <div class="flex items-center gap-2 min-w-0">
+                        <span class="w-2 h-2 rounded-full shrink-0" style="background-color: ${color};"></span>
+                        <span class="ed-text-secondary truncate">${escapeHTML(cat)}</span>
+                      </div>
+                      <div class="flex items-center gap-2 shrink-0 ml-2">
+                        <span class="ed-text-muted text-[11px]">${formatCurrency(val)}</span>
+                        <span class="ed-text-primary font-medium w-8 text-right">${pct}%</span>
+                      </div>
+                    </div>
+                  `;
+                }).join('') : `<p class="text-xs ed-text-muted leading-relaxed">Aucune dépense enregistrée pour ce mois.</p>`}
+              </div>
+            </div>
+          </section>
+
+          <!-- Recherche & Filtres -->
+          <section class="space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex gap-1.5 text-[11px]">
+                ${[
+                  { key: 'all', label: 'Tout' },
+                  { key: 'expense', label: 'Dépenses' },
+                  { key: 'income', label: 'Revenus' }
+                ].map(f => {
+                  const active = financeFilter === f.key;
+                  return `
+                    <button
+                      onclick="setFinanceFilter('${f.key}')"
+                      class="px-3 py-1.5 rounded-full border transition-colors ${active ? 'ed-btn-primary border-transparent font-medium' : 'ed-surface ed-border ed-text-secondary'}"
+                    >${f.label}</button>
+                  `;
+                }).join('')}
+              </div>
+              <span class="text-[11px] ed-text-muted">${filteredList.length} op.</span>
+            </div>
+
+            <input
+              id="finance-search-input"
+              type="text"
+              value="${escapeHTML(financeSearch)}"
+              oninput="updateFinanceSearch(this.value)"
+              placeholder="Rechercher un libellé, une catégorie..."
+              class="w-full text-xs px-3.5 py-2.5 rounded-xl ed-input border"
+            />
+
+            <!-- Liste complète des opérations -->
+            <div class="space-y-2.5 pt-1">
+              ${filteredList.length > 0 ? filteredList.map(tx => {
+                const isInc = tx.type === 'income';
+                return `
+                  <article class="flex items-center justify-between gap-2.5 p-3 rounded-2xl ed-surface ed-surface-interactive border ed-border transition-colors">
+                    <div onclick="openTransactionModal('${tx.type}', '${tx.id}')" class="flex items-center gap-3 min-w-0 flex-1 cursor-pointer">
+                      ${getCategoryIconHTML(tx.category, isInc)}
+                      <div class="min-w-0">
+                        <h3 class="text-sm font-medium ed-text-primary truncate">${escapeHTML(tx.title)}</h3>
+                        <p class="text-[11px] ed-text-muted truncate">
+                          ${escapeHTML(tx.category)} · ${tx.date.split('-').reverse().join('/')}${tx.note ? ' · ' + escapeHTML(tx.note) : ''}
+                        </p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                      <span onclick="openTransactionModal('${tx.type}', '${tx.id}')" class="font-serif text-sm font-medium cursor-pointer ${isInc ? 'ed-positive' : 'ed-negative'}">
+                        ${state.discreetMode ? '•••• €' : (isInc ? '+' : '-') + formatCurrency(tx.amount, false)}
+                      </span>
+                      <button
+                        onclick="deleteTransaction('${tx.id}')"
+                        title="Supprimer l'opération"
+                        aria-label="Supprimer"
+                        class="w-7 h-7 rounded-full flex items-center justify-center ed-text-muted hover:ed-negative transition-colors text-xs"
+                      >✕</button>
+                    </div>
+                  </article>
+                `;
+              }).join('') : `
+                <div class="text-center py-9 px-4 rounded-2xl ed-surface border ed-border">
+                  <div class="w-11 h-11 mx-auto mb-2.5 rounded-full ed-surface-alt border ed-border flex items-center justify-center">
+                    <svg class="w-5 h-5 ed-warm-accent" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <rect x="5" y="8" width="22" height="17" rx="5" />
+                      <path d="M5 15h22" />
+                      <circle cx="16" cy="19.5" r="1.5" />
+                    </svg>
+                  </div>
+                  <p class="font-serif italic text-sm ed-text-primary">
+                    ${metrics.list.length === 0
+                      ? 'Aucune écriture sur cette page.'
+                      : 'Aucune opération ne correspond à votre recherche.'}
+                  </p>
+                </div>
+              `}
+            </div>
+          </section>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 8. VUE 3 : ONGLET PLUS (PERSONNALISATION, ÉVOLUTIVITÉ & SAUVEGARDE)
+    // =========================================================================
+    function updateUserName(val) {
+      state.userName = val;
+      saveState();
+      updateWelcomeGreeting();
+    }
+
+    function toggleWelcomeSetting() {
+      state.showWelcomeOnOpen = !state.showWelcomeOnOpen;
+      saveState();
+      renderActiveView();
+      showToast(state.showWelcomeOnOpen ? 'Écran de bienvenue activé à l’ouverture' : 'Écran de bienvenue désactivé');
+    }
+
+    function renderMoreView() {
+      const isDark = document.documentElement.classList.contains('dark');
+
+      return `
+        <div class="space-y-6 animate-fade-in">
+          <!-- 1. PERSONNALISATION & APPARENCE -->
+          <section class="p-4 rounded-2xl ed-surface border ed-border space-y-4">
+            <h2 class="text-[11px] uppercase tracking-[0.2em] ed-text-secondary font-medium">PERSONNALISATION & APPARENCE</h2>
+
+            <div>
+              <label for="user-name-input" class="text-xs ed-text-secondary block mb-1.5">Prénom sur l’écran de bienvenue</label>
+              <input
+                id="user-name-input"
+                type="text"
+                value="${escapeHTML(state.userName || '')}"
+                oninput="updateUserName(this.value)"
+                placeholder="Ex: John, Camille..."
+                class="w-full text-sm px-3.5 py-2.5 rounded-xl ed-input border"
+              />
+            </div>
+
+            <!-- Interrupteur Mode Nuit / Jour -->
+            <div class="flex items-center justify-between pt-2 border-t ed-border">
+              <div>
+                <p class="text-sm font-medium ed-text-primary">Mode Nuit</p>
+                <p class="text-[11px] ed-text-muted">${isDark ? 'Fond sombre mat activé' : 'Papier crème jour activé'}</p>
+              </div>
+              <button
+                onclick="toggleTheme()"
+                role="switch"
+                aria-checked="${isDark}"
+                class="w-12 h-7 rounded-full p-1 transition-colors border ed-border ${isDark ? 'ed-btn-primary' : 'ed-surface-alt'}"
+              >
+                <span class="block w-4 h-4 rounded-full transition-transform ${isDark ? 'translate-x-5 bg-neutral-900' : 'translate-x-0 bg-neutral-700'}"></span>
+              </button>
+            </div>
+
+            <!-- Interrupteur Écran de bienvenue à chaque ouverture -->
+            <div class="flex items-center justify-between pt-2 border-t ed-border">
+              <div class="pr-3">
+                <p class="text-sm font-medium ed-text-primary">Écran de bienvenue</p>
+                <p class="text-[11px] ed-text-muted">Afficher automatiquement à chaque ouverture</p>
+              </div>
+              <button
+                onclick="toggleWelcomeSetting()"
+                role="switch"
+                aria-checked="${state.showWelcomeOnOpen}"
+                class="w-12 h-7 rounded-full p-1 transition-colors border ed-border shrink-0 ${state.showWelcomeOnOpen ? 'ed-btn-primary' : 'ed-surface-alt'}"
+              >
+                <span class="block w-4 h-4 rounded-full transition-transform ${state.showWelcomeOnOpen ? 'translate-x-5 bg-neutral-900' : 'translate-x-0 bg-neutral-700'}"></span>
+              </button>
+            </div>
+
+            <!-- Interrupteur Signature sonore & haptique -->
+            <div class="flex items-center justify-between pt-2 border-t ed-border">
+              <div class="pr-3">
+                <p class="text-sm font-medium ed-text-primary">Signature feutrée</p>
+                <p class="text-[11px] ed-text-muted">Déclic doux et vibration lors des ajouts</p>
+              </div>
+              <button
+                onclick="toggleSoundEffects()"
+                role="switch"
+                aria-checked="${state.soundEffects}"
+                class="w-12 h-7 rounded-full p-1 transition-colors border ed-border shrink-0 ${state.soundEffects ? 'ed-btn-primary' : 'ed-surface-alt'}"
+              >
+                <span class="block w-4 h-4 rounded-full transition-transform ${state.soundEffects ? 'translate-x-5 bg-neutral-900' : 'translate-x-0 bg-neutral-700'}"></span>
+              </button>
+            </div>
+
+            <button
+              onclick="showWelcomeScreen()"
+              class="w-full py-2.5 px-4 rounded-xl ed-surface-alt border ed-border text-xs font-medium ed-text-primary hover:opacity-85 transition-opacity"
+            >
+              Revoir l’écran de bienvenue
+            </button>
+          </section>
+
+          <!-- 2. MODULES FUTURS (ARCHITECTURE ÉVOLUTIVE) -->
+          <section class="p-4 rounded-2xl ed-surface border ed-border space-y-3">
+            <div class="flex items-center justify-between">
+              <h2 class="text-[11px] uppercase tracking-[0.2em] ed-text-secondary font-medium">MODULES FUTURS</h2>
+              <span class="text-[10px] px-2 py-0.5 rounded-full ed-surface-alt border ed-border ed-text-muted">Évolutif</span>
+            </div>
+            <p class="text-xs ed-text-secondary leading-relaxed">
+              Votre espace est conçu pour rester léger aujourd’hui et accueillir de nouveaux outils quand vous le souhaiterez :
+            </p>
+
+            <div class="space-y-2 pt-1">
+              ${[
+                { name: 'Répertoire de recettes', desc: 'Carnet culinaire et listes de courses', status: 'À venir' },
+                { name: 'Objectifs d’épargne', desc: 'Suivi de projets et tirelires dédiées', status: 'Prévu' },
+                { name: 'Notes rapides', desc: 'Bloc-notes minimaliste personnel', status: 'Prévu' }
+              ].map(mod => `
+                <div class="flex items-center justify-between p-3 rounded-xl ed-surface-alt border ed-border">
+                  <div>
+                    <p class="text-xs font-medium ed-text-primary">${mod.name}</p>
+                    <p class="text-[11px] ed-text-muted mt-0.5">${mod.desc}</p>
+                  </div>
+                  <span class="text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full ed-surface border ed-border ed-text-secondary shrink-0">
+                    ${mod.status}
+                  </span>
+                </div>
+              `).join('')}
+            </div>
+          </section>
+
+          <!-- 3. DONNÉES & SAUVEGARDE -->
+          <section class="p-4 rounded-2xl ed-surface border ed-border space-y-3">
+            <h2 class="text-[11px] uppercase tracking-[0.2em] ed-text-secondary font-medium">DONNÉES & SAUVEGARDE</h2>
+            <div class="grid grid-cols-2 gap-2.5">
+              <button onclick="exportJSON()" class="text-xs font-medium py-2.5 px-3 rounded-xl ed-surface-alt border ed-border ed-text-primary hover:opacity-85 transition-opacity">
+                Exporter JSON
+              </button>
+              <label class="text-xs font-medium py-2.5 px-3 rounded-xl ed-surface-alt border ed-border ed-text-primary hover:opacity-85 transition-opacity text-center cursor-pointer">
+                Importer JSON
+                <input type="file" accept=".json" onchange="importJSON(event)" class="hidden" />
+              </label>
+            </div>
+            <button onclick="confirmResetAll()" class="w-full text-[11px] ed-text-muted hover:ed-negative pt-1 transition-colors">
+              Tout remettre à zéro
+            </button>
+          </section>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 9. MODALE D'AJOUT / ÉDITION D'UNE OPÉRATION FINANCIÈRE
+    // =========================================================================
+    function openModal(html) {
+      const backdrop = document.getElementById('modal-backdrop');
+      const panel = document.getElementById('modal-panel');
+      panel.innerHTML = html;
+      backdrop.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-backdrop').classList.add('hidden');
+    }
+
+    function closeModalOnBackdrop(e) {
+      if (e.target.id === 'modal-backdrop') closeModal();
+    }
+
+    function openTransactionModal(defaultType = 'expense', editId = null) {
+      const existing = editId ? state.transactions.find(t => t.id === editId) : null;
+      const type = existing ? existing.type : defaultType;
+      const title = existing ? existing.title : '';
+      const amount = existing ? existing.amount : '';
+      const category = existing ? existing.category : (type === 'income' ? 'Salaire' : 'Courses');
+      const date = existing ? existing.date : new Date().toISOString().split('T')[0];
+      const note = existing ? (existing.note || '') : '';
+
+      openModal(`
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-serif text-xl font-medium ed-text-primary">
+              ${existing ? 'Modifier l’opération' : 'Nouvelle opération'}
+            </h3>
+            <button onclick="closeModal()" class="w-8 h-8 rounded-full ed-surface border ed-border flex items-center justify-center ed-text-secondary hover:ed-text-primary text-xs">✕</button>
+          </div>
+
+          <form onsubmit="submitTransaction(event, '${editId || ''}')" class="space-y-3.5">
+            <!-- Sélecteur Dépense / Revenu -->
+            <div class="grid grid-cols-2 gap-2.5">
+              <label class="cursor-pointer">
+                <input type="radio" name="txType" value="expense" ${type === 'expense' ? 'checked' : ''} class="peer hidden" />
+                <div class="text-center text-xs py-2.5 rounded-xl border ed-border ed-surface ed-text-secondary peer-checked:ed-text-primary peer-checked:font-semibold peer-checked:border-current transition-all">
+                  Dépense
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="txType" value="income" ${type === 'income' ? 'checked' : ''} class="peer hidden" />
+                <div class="text-center text-xs py-2.5 rounded-xl border ed-border ed-surface ed-text-secondary peer-checked:ed-text-primary peer-checked:font-semibold peer-checked:border-current transition-all">
+                  Recette / Revenu
+                </div>
+              </label>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label class="text-[11px] ed-text-secondary block mb-1">Montant (€)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  name="amount"
+                  value="${amount}"
+                  required
+                  placeholder="0.00"
+                  class="w-full text-sm px-3.5 py-2.5 rounded-xl ed-input border"
+                />
+              </div>
+              <div>
+                <label class="text-[11px] ed-text-secondary block mb-1">Date</label>
+                <input
+                  type="date"
+                  name="date"
+                  value="${date}"
+                  required
+                  class="w-full text-sm px-3.5 py-2.5 rounded-xl ed-input border"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="text-[11px] ed-text-secondary block mb-1">Libellé</label>
+              <input
+                type="text"
+                name="title"
+                value="${escapeHTML(title)}"
+                required
+                placeholder="Ex: Courses, Loyer, Salaire..."
+                class="w-full text-sm px-3.5 py-2.5 rounded-xl ed-input border"
+              />
+            </div>
+
+            <div>
+              <label class="text-[11px] ed-text-secondary block mb-1">Catégorie</label>
+              <select name="category" class="w-full text-sm px-3.5 py-2.5 rounded-xl ed-input border">
+                ${Object.keys(CATEGORIES).map(cat => `
+                  <option value="${cat}" ${category === cat ? 'selected' : ''}>${cat}</option>
+                `).join('')}
+              </select>
+            </div>
+
+            <div>
+              <label class="text-[11px] ed-text-secondary block mb-1">Note (optionnel)</label>
+              <input
+                type="text"
+                name="note"
+                value="${escapeHTML(note)}"
+                placeholder="Détail complémentaire..."
+                class="w-full text-sm px-3.5 py-2.5 rounded-xl ed-input border"
+              />
+            </div>
+
+            <div class="flex gap-2.5 pt-2">
+              ${existing ? `
+                <button
+                  type="button"
+                  onclick="deleteTransaction('${existing.id}'); closeModal();"
+                  class="px-4 py-3 rounded-xl border ed-border ed-surface ed-negative text-xs font-medium"
+                >
+                  Supprimer
+                </button>
+              ` : ''}
+              <button type="submit" class="flex-1 ed-btn-primary text-sm font-medium py-3 rounded-xl active:scale-[0.99] transition-transform">
+                ${existing ? 'Mettre à jour' : 'Enregistrer'}
+              </button>
+            </div>
+          </form>
+        </div>
+      `);
+    }
+
+    function submitTransaction(e, editId) {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const txData = {
+        id: editId || ('tx_' + Date.now()),
+        type: fd.get('txType'),
+        title: fd.get('title').trim(),
+        amount: parseFloat(fd.get('amount')),
+        category: fd.get('category'),
+        date: fd.get('date'),
+        note: fd.get('note').trim()
+      };
+
+      if (editId) {
+        const idx = state.transactions.findIndex(t => t.id === editId);
+        if (idx !== -1) state.transactions[idx] = txData;
+      } else {
+        state.transactions.unshift(txData);
+      }
+
+      state.selectedMonth = txData.date.slice(0, 7);
+      saveState();
+      playSoftChime('save');
+      closeModal();
+      renderActiveView();
+      showToast(editId ? 'Opération mise à jour' : (txData.type === 'income' ? 'Recette ajoutée au coffre' : 'Dépense enregistrée'));
+    }
+
+    function deleteTransaction(id) {
+      state.transactions = state.transactions.filter(t => t.id !== id);
+      saveState();
+      renderActiveView();
+      showToast('Opération supprimée');
+    }
+
+    // =========================================================================
+    // 10. EXPORT / IMPORT JSON & RÉINITIALISATION
+    // =========================================================================
+    function exportJSON() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `coffre-doux-finances-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Sauvegarde JSON téléchargée');
+    }
+
+    function importJSON(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const imported = JSON.parse(evt.target.result);
+          state = {
+            ...createCleanData(),
+            ...imported,
+            transactions: Array.isArray(imported.transactions) ? imported.transactions : []
+          };
+          saveState();
+          updateWelcomeGreeting();
+          renderActiveView();
+          showToast('Données importées avec succès');
+        } catch (err) {
+          showToast('Fichier JSON invalide');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function confirmResetAll() {
+      openModal(`
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-serif text-xl font-medium ed-text-primary">Tout remettre à zéro ?</h3>
+            <button onclick="closeModal()" class="w-8 h-8 rounded-full ed-surface border ed-border flex items-center justify-center ed-text-secondary hover:ed-text-primary text-xs">✕</button>
+          </div>
+          <p class="text-xs ed-text-secondary leading-relaxed">
+            Toutes vos opérations enregistrées seront définitivement supprimées et votre solde repassera à <strong class="ed-text-primary font-medium">0,00 €</strong>. Pensez à exporter vos données en JSON avant si vous souhaitez garder une copie.
+          </p>
+          <div class="grid grid-cols-2 gap-2.5 pt-2">
+            <button type="button" onclick="closeModal()" class="py-3 rounded-xl border ed-border ed-surface ed-text-primary text-xs font-medium">
+              Annuler
+            </button>
+            <button type="button" onclick="executeResetAll()" class="py-3 rounded-xl border ed-border ed-surface ed-negative text-xs font-semibold">
+              Tout effacer
+            </button>
+          </div>
+        </div>
+      `);
+    }
+
+    function executeResetAll() {
+      const preservedName = state.userName;
+      const preservedWelcome = state.showWelcomeOnOpen;
+      state = createCleanData();
+      state.userName = preservedName;
+      state.showWelcomeOnOpen = preservedWelcome;
+      saveState();
+      closeModal();
+      renderActiveView();
+      showToast('Toutes les données ont été remises à zéro');
+    }
+
+    // =========================================================================
+    // 11. INITIALISATION AU CHARGEMENT
+    // =========================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      syncThemeUI();
+      updateWelcomeGreeting();
+      switchTab('home');
+
+      if (state.showWelcomeOnOpen) {
+        showWelcomeScreen();
+      }
+    });
+  </script>
+</body>
+</html>
