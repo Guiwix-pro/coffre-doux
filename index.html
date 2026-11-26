@@ -2,12 +2,53 @@
 <html lang="fr" class="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Coffre-Doux" />
   <meta id="meta-theme-color" name="theme-color" content="#0E0E10" />
   <title>Coffre-Doux — Suivi Financier Éditorial</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%230E0E10'/%3E%3Crect x='11' y='11' width='42' height='42' rx='13' fill='none' stroke='%23E28E76' stroke-width='2.6'/%3E%3Ctext x='27' y='37' text-anchor='middle' font-family='Georgia, serif' font-size='22' fill='%23E28E76'%3EC%3C/text%3E%3Ctext x='38' y='43' text-anchor='middle' font-family='Georgia, serif' font-size='22' fill='%23E28E76'%3ED%3C/text%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230E0E10'/%3E%3Crect x='30' y='30' width='120' height='120' rx='36' fill='none' stroke='%23E28E76' stroke-width='6'/%3E%3Ctext x='76' y='105' text-anchor='middle' font-family='Georgia, serif' font-size='64' fill='%23E28E76'%3EC%3C/text%3E%3Ctext x='108' y='122' text-anchor='middle' font-family='Georgia, serif' font-size='64' fill='%23E28E76'%3ED%3C/text%3E%3C/svg%3E" />
+  <link id="pwa-manifest" rel="manifest" />
+  <script>
+    // Génération dynamique du Manifest PWA pour le mode plein écran (standalone) sur Android & iOS
+    (function() {
+      const iconSvg = "data:image/svg+xml," + encodeURIComponent(
+        "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'>" +
+        "<rect width='512' height='512' rx='112' fill='#0E0E10'/>" +
+        "<rect x='84' y='84' width='344' height='344' rx='102' fill='none' stroke='#E28E76' stroke-width='16'/>" +
+        "<text x='216' y='298' text-anchor='middle' font-family='Georgia, serif' font-size='180' fill='#E28E76'>C</text>" +
+        "<text x='306' y='346' text-anchor='middle' font-family='Georgia, serif' font-size='180' fill='#E28E76'>D</text>" +
+        "</svg>"
+      );
+      const manifest = {
+        name: "Coffre-Doux",
+        short_name: "Coffre-Doux",
+        description: "Suivi financier éditorial et rassurant",
+        start_url: window.location.href.split('#')[0],
+        scope: "./",
+        display: "standalone",
+        orientation: "portrait",
+        background_color: "#0E0E10",
+        theme_color: "#0E0E10",
+        icons: [
+          {
+            src: iconSvg,
+            sizes: "512x512",
+            type: "image/svg+xml",
+            purpose: "any maskable"
+          }
+        ]
+      };
+      const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+      const manifestEl = document.getElementById('pwa-manifest');
+      if (manifestEl) {
+        manifestEl.setAttribute('href', URL.createObjectURL(blob));
+      }
+    })();
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -189,7 +230,7 @@
 <body class="font-sans antialiased min-h-screen flex justify-center items-center sm:p-4">
 
   <!-- Conteneur Mobile-First -->
-  <div id="app-shell" class="relative w-full sm:max-w-[430px] h-screen sm:h-[850px] sm:rounded-[2.25rem] sm:shadow-2xl sm:border ed-border flex flex-col overflow-hidden">
+  <div id="app-shell" class="relative w-full sm:max-w-[430px] h-[100dvh] sm:h-[850px] sm:rounded-[2.25rem] sm:shadow-2xl sm:border ed-border flex flex-col overflow-hidden">
 
     <!-- =====================================================================
          1. ÉCRAN DE BIENVENUE (SPLASH / ONBOARDING D'ENTRÉE)
