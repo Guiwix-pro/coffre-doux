@@ -13,40 +13,72 @@
   <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230E0E10'/%3E%3Crect x='30' y='30' width='120' height='120' rx='36' fill='none' stroke='%23E28E76' stroke-width='6'/%3E%3Ctext x='76' y='105' text-anchor='middle' font-family='Georgia, serif' font-size='64' fill='%23E28E76'%3EC%3C/text%3E%3Ctext x='108' y='122' text-anchor='middle' font-family='Georgia, serif' font-size='64' fill='%23E28E76'%3ED%3C/text%3E%3C/svg%3E" />
   <link id="pwa-manifest" rel="manifest" />
   <script>
-    // Génération dynamique du Manifest PWA pour le mode plein écran (standalone) sur Android & iOS
+    // Génération d'une icône PNG 512x512 et d'un manifeste Data URI 100% compatible Android Chrome PWA
     (function() {
-      const iconSvg = "data:image/svg+xml," + encodeURIComponent(
-        "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'>" +
-        "<rect width='512' height='512' rx='112' fill='#0E0E10'/>" +
-        "<rect x='84' y='84' width='344' height='344' rx='102' fill='none' stroke='#E28E76' stroke-width='16'/>" +
-        "<text x='216' y='298' text-anchor='middle' font-family='Georgia, serif' font-size='180' fill='#E28E76'>C</text>" +
-        "<text x='306' y='346' text-anchor='middle' font-family='Georgia, serif' font-size='180' fill='#E28E76'>D</text>" +
-        "</svg>"
-      );
-      const manifest = {
-        name: "Coffre-Doux",
-        short_name: "Coffre-Doux",
-        description: "Suivi financier éditorial et rassurant",
-        start_url: window.location.href.split('#')[0],
-        scope: "./",
-        display: "standalone",
-        orientation: "portrait",
-        background_color: "#0E0E10",
-        theme_color: "#0E0E10",
-        icons: [
-          {
-            src: iconSvg,
-            sizes: "512x512",
-            type: "image/svg+xml",
-            purpose: "any maskable"
-          }
-        ]
-      };
-      const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
-      const manifestEl = document.getElementById('pwa-manifest');
-      if (manifestEl) {
-        manifestEl.setAttribute('href', URL.createObjectURL(blob));
-      }
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+
+        // Fond sombre éditorial
+        ctx.fillStyle = '#0E0E10';
+        ctx.fillRect(0, 0, 512, 512);
+
+        // Cadre arrondi terracotta
+        ctx.strokeStyle = '#E28E76';
+        ctx.lineWidth = 18;
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(84, 84, 344, 344, 96);
+        } else {
+          ctx.rect(84, 84, 344, 344);
+        }
+        ctx.stroke();
+
+        // Monogramme CD
+        ctx.fillStyle = '#E28E76';
+        ctx.font = '500 175px Georgia, serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('C', 216, 240);
+        ctx.fillText('D', 304, 288);
+
+        const pngDataUrl = canvas.toDataURL('image/png');
+        const pageUrl = window.location.href.split('#')[0].split('?')[0];
+
+        const manifest = {
+          name: "Coffre-Doux",
+          short_name: "Coffre-Doux",
+          description: "Suivi financier éditorial et rassurant",
+          start_url: pageUrl,
+          scope: pageUrl.substring(0, pageUrl.lastIndexOf('/') + 1),
+          display: "standalone",
+          orientation: "portrait",
+          background_color: "#0E0E10",
+          theme_color: "#0E0E10",
+          icons: [
+            {
+              src: pngDataUrl,
+              sizes: "192x192",
+              type: "image/png",
+              purpose: "any"
+            },
+            {
+              src: pngDataUrl,
+              sizes: "512x512",
+              type: "image/png",
+              purpose: "any"
+            }
+          ]
+        };
+
+        const manifestDataUrl = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
+        const manifestEl = document.getElementById('pwa-manifest');
+        if (manifestEl) {
+          manifestEl.setAttribute('href', manifestDataUrl);
+        }
+      } catch (e) {}
     })();
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
