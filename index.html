@@ -818,6 +818,61 @@
     let state = loadState();
     let currentTxType = 'expense';
     let toastTimer = null;
+    const IDB_NAME = 'CoffreDouxDB';
+    const IDB_STORE = 'stateStore';
+    const IDB_KEY = 'currentState';
+
+    function openVaultDB() {
+      return new Promise((resolve) => {
+        try {
+          if (!('indexedDB' in window)) return resolve(null);
+          const req = window.indexedDB.open(IDB_NAME, 1);
+          req.onupgradeneeded = () => {
+            const db = req.result;
+            if (!db.objectStoreNames.contains(IDB_STORE)) {
+              db.createObjectStore(IDB_STORE);
+            }
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => resolve(null);
+        } catch (e) {
+          resolve(null);
+        }
+      });
+    }
+
+    async function writeIndexedDB(serialized) {
+      try {
+        const db = await openVaultDB();
+        if (!db) return;
+        const tx = db.transaction(IDB_STORE, 'readwrite');
+        tx.objectStore(IDB_STORE).put(serialized, IDB_KEY);
+      } catch (e) {}
+    }
+
+    async function readIndexedDB() {
+      try {
+        const db = await openVaultDB();
+        if (!db) return null;
+        return await new Promise((resolve) => {
+          const tx = db.transaction(IDB_STORE, 'readonly');
+          const req = tx.objectStore(IDB_STORE).get(IDB_KEY);
+          req.onsuccess = () => resolve(req.result || null);
+          req.onerror = () => resolve(null);
+        });
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function clearIndexedDB() {
+      try {
+        const db = await openVaultDB();
+        if (!db) return;
+        const tx = db.transaction(IDB_STORE, 'readwrite');
+        tx.objectStore(IDB_STORE).delete(IDB_KEY);
+      } catch (e) {}
+    }
 
     function readPersistedRaw() {
       try {
@@ -853,6 +908,9 @@
           document.cookie = `${STORAGE_KEY}=${encodeURIComponent(serialized)}; max-age=31536000; path=/; SameSite=Lax`;
         }
       } catch (e) {}
+
+      // Sauvegarde persistante complémentaire dans IndexedDB pour les fermetures d'appli mobile
+      writeIndexedDB(serialized);
     }
 
     function clearPersistedRaw() {
@@ -865,24 +923,28 @@
         }
         document.cookie = `${STORAGE_KEY}=; max-age=0; path=/; SameSite=Lax`;
       } catch (e) {}
+      clearIndexedDB();
+    }
+
+    function normalizeLoadedState(parsed) {
+      const defaults = createDefaultState();
+      const cleanedName = String((parsed && parsed.userName) || '').trim();
+      return {
+        ...defaults,
+        ...(parsed || {}),
+        userName: cleanedName,
+        hapticPattern: 'feather',
+        onboardingCompleted: Boolean((parsed && parsed.onboardingCompleted) || cleanedName.length > 0),
+        transactions: Array.isArray(parsed && parsed.transactions) ? parsed.transactions : [],
+        goals: Array.isArray(parsed && parsed.goals) ? parsed.goals : []
+      };
     }
 
     function loadState() {
       try {
         const raw = readPersistedRaw();
         if (!raw) return createDefaultState();
-        const parsed = JSON.parse(raw);
-        const defaults = createDefaultState();
-        const cleanedName = String(parsed.userName || '').trim();
-        return {
-          ...defaults,
-          ...parsed,
-          userName: cleanedName,
-          hapticPattern: 'feather',
-          onboardingCompleted: Boolean(parsed.onboardingCompleted || cleanedName.length > 0),
-          transactions: Array.isArray(parsed.transactions) ? parsed.transactions : [],
-          goals: Array.isArray(parsed.goals) ? parsed.goals : []
-        };
+        return normalizeLoadedState(JSON.parse(raw));
       } catch (e) {
         return createDefaultState();
       }
@@ -1911,152 +1973,35 @@
       showToast('Coffre remis à zéro');
     }
 
-    function escapeHtml(str) {
-      return String(str || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    }
+    // Sauvegarde automatique dès qu'on quitte l'onglet ou ferme l'application mobile
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        saveState();
+      }
+    });
+    window.addEventListener('pagehide', () => {
+      saveState();
+    });
 
-    function escapeAttr(str) {
-      return escapeHtml(str).replace(/'/g, '&#39;');
-    }
-
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
-      });
-    }
-
-    function buildVaultCanvasIcon(size) {
-      const canvas = document.createElement('canvas');
-      canvas.width = size;
-      canvas.height = size;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return '';
-
-      const s = size / 512;
-      ctx.save();
-      ctx.scale(s, s);
-
-      // Fond cacao velouté avec coins arrondis d'icône d'application
-      const bgGrad = ctx.createLinearGradient(0, 0, 512, 512);
-      bgGrad.addColorStop(0, '#231F1C');
-      bgGrad.addColorStop(0.55, '#191614');
-      bgGrad.addColorStop(1, '#12100F');
-      ctx.fillStyle = bgGrad;
-      ctx.beginPath();
-      ctx.roundRect(0, 0, 512, 512, 118);
-      ctx.fill();
-
-      // Lueur douce terracotta dans l'angle supérieur droit
-      const glowGrad = ctx.createRadialGradient(430, 82, 10, 430, 82, 230);
-      glowGrad.addColorStop(0, 'rgba(226, 142, 118, 0.24)');
-      glowGrad.addColorStop(1, 'rgba(226, 142, 118, 0)');
-      ctx.fillStyle = glowGrad;
-      ctx.beginPath();
-      ctx.roundRect(0, 0, 512, 512, 118);
-      ctx.fill();
-
-      // Bordure d'icône subtile façon cuivre chaud
-      const borderGrad = ctx.createLinearGradient(60, 20, 460, 490);
-      borderGrad.addColorStop(0, 'rgba(245, 239, 234, 0.28)');
-      borderGrad.addColorStop(0.5, 'rgba(226, 142, 118, 0.42)');
-      borderGrad.addColorStop(1, 'rgba(245, 239, 234, 0.12)');
-      ctx.strokeStyle = borderGrad;
-      ctx.lineWidth = 8;
-      ctx.beginPath();
-      ctx.roundRect(22, 22, 468, 468, 98);
-      ctx.stroke();
-
-      // Arc circulaire ouvert autour du monogramme CD
-      const arcGrad = ctx.createLinearGradient(110, 90, 405, 340);
-      arcGrad.addColorStop(0, '#F3C7B6');
-      arcGrad.addColorStop(0.55, '#E28E76');
-      arcGrad.addColorStop(1, 'rgba(226, 142, 118, 0.12)');
-      ctx.strokeStyle = arcGrad;
-      ctx.lineWidth = 5;
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.arc(256, 224, 138, Math.PI * 0.86, Math.PI * 2.16, false);
-      ctx.stroke();
-
-      // Dégradé métallique doux terracotta / crème pour le monogramme CD
-      const monoGrad = ctx.createLinearGradient(165, 135, 355, 310);
-      monoGrad.addColorStop(0, '#F5EFEA');
-      monoGrad.addColorStop(0.5, '#E89C84');
-      monoGrad.addColorStop(1, '#C9755E');
-
-      // Ombre portée légère pour la profondeur éditoriale
-      ctx.save();
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
-      ctx.shadowBlur = 16;
-      ctx.shadowOffsetY = 8;
-
-      ctx.fillStyle = monoGrad;
-      ctx.font = '500 132px "Playfair Display", Georgia, serif';
-      ctx.textBaseline = 'alphabetic';
-      ctx.textAlign = 'left';
-      ctx.fillText('C', 156, 248);
-      ctx.fillText('D', 248, 294);
-      ctx.restore();
-
-      // Lettrage éditorial "Coffre-Doux" en bas sans cœur
-      ctx.font = '400 44px Inter, -apple-system, BlinkMacSystemFont, sans-serif';
-      ctx.textBaseline = 'alphabetic';
-      ctx.textAlign = 'left';
-      const leftText = 'Coffre-';
-      const rightText = 'Doux';
-      const wLeft = ctx.measureText(leftText).width;
-      const wRight = ctx.measureText(rightText).width;
-      const startX = (512 - (wLeft + wRight)) / 2;
-      const baseY = 422;
-
-      ctx.fillStyle = '#F5EFEA';
-      ctx.fillText(leftText, startX, baseY);
-
-      ctx.fillStyle = '#E28E76';
-      ctx.fillText(rightText, startX + wLeft, baseY);
-
-      ctx.restore();
-      return canvas.toDataURL('image/png');
-    }
-
-    (function ensureRasterAppIcons() {
+    // Synchronisation asynchrone depuis IndexedDB si localStorage a été vidé par le navigateur mobile
+    (async function hydrateFromIndexedDBIfNeeded() {
       try {
-        const icon192 = buildVaultCanvasIcon(192);
-        const icon512 = buildVaultCanvasIcon(512);
-        if (!icon512) return;
-
-        const appleIcon = document.getElementById('apple-touch-icon');
-        if (appleIcon) appleIcon.href = icon512;
-
-        const favicon = document.getElementById('dynamic-favicon');
-        if (favicon) {
-          favicon.type = 'image/png';
-          favicon.href = icon192 || icon512;
-        }
-
-        const manifestLink = document.querySelector('link[rel="manifest"]');
-        if (manifestLink && icon192) {
-          const dynamicManifest = {
-            name: 'Coffre-Doux',
-            short_name: 'Coffre-Doux',
-            description: 'Suivi financier éditorial et rassurant',
-            start_url: './index.html',
-            scope: './',
-            display: 'standalone',
-            orientation: 'portrait',
-            background_color: '#141211',
-            theme_color: '#141211',
-            icons: [
-              { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any' },
-              { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any' }
-            ]
-          };
-          const blob = new Blob([JSON.stringify(dynamicManifest)], { type: 'application/manifest+json' });
-          manifestLink.href = URL.createObjectURL(blob);
+        if (state.onboardingCompleted && state.userName) return;
+        const idbRaw = await readIndexedDB();
+        if (!idbRaw) return;
+        const parsed = JSON.parse(idbRaw);
+        const hydrated = normalizeLoadedState(parsed);
+        if (hydrated.onboardingCompleted || hydrated.userName || hydrated.transactions.length || hydrated.goals.length) {
+          state = hydrated;
+          try {
+            window.localStorage.setItem(STORAGE_KEY, idbRaw);
+          } catch (e) {}
+          syncWelcomeHeader();
+          if (state.onboardingCompleted && !state.showWelcomeOnLaunch) {
+            document.body.classList.remove('onboarding-open');
+            document.getElementById('welcome-screen').classList.add('hidden');
+          }
+          render();
         }
       } catch (e) {}
     })();
