@@ -819,17 +819,67 @@
     let currentTxType = 'expense';
     let toastTimer = null;
 
+    function readPersistedRaw() {
+      try {
+        const ls = window.localStorage.getItem(STORAGE_KEY);
+        if (ls) return ls;
+      } catch (e) {}
+
+      try {
+        const match = document.cookie.split('; ').find(row => row.startsWith(`${STORAGE_KEY}=`));
+        if (match) {
+          return decodeURIComponent(match.split('=').slice(1).join('='));
+        }
+      } catch (e) {}
+
+      try {
+        if (window.name && window.name.startsWith('COFFRE_DOUX_STATE:')) {
+          return window.name.slice('COFFRE_DOUX_STATE:'.length);
+        }
+      } catch (e) {}
+
+      return null;
+    }
+
+    function writePersistedRaw(serialized) {
+      try {
+        window.localStorage.setItem(STORAGE_KEY, serialized);
+      } catch (e) {}
+
+      try {
+        // Miroir en mémoire de fenêtre et cookie long terme en cas d'isolation PWA/mobile
+        window.name = `COFFRE_DOUX_STATE:${serialized}`;
+        if (serialized.length <= 3600) {
+          document.cookie = `${STORAGE_KEY}=${encodeURIComponent(serialized)}; max-age=31536000; path=/; SameSite=Lax`;
+        }
+      } catch (e) {}
+    }
+
+    function clearPersistedRaw() {
+      try {
+        window.localStorage.removeItem(STORAGE_KEY);
+      } catch (e) {}
+      try {
+        if (window.name && window.name.startsWith('COFFRE_DOUX_STATE:')) {
+          window.name = '';
+        }
+        document.cookie = `${STORAGE_KEY}=; max-age=0; path=/; SameSite=Lax`;
+      } catch (e) {}
+    }
+
     function loadState() {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
+        const raw = readPersistedRaw();
         if (!raw) return createDefaultState();
         const parsed = JSON.parse(raw);
         const defaults = createDefaultState();
+        const cleanedName = String(parsed.userName || '').trim();
         return {
           ...defaults,
           ...parsed,
+          userName: cleanedName,
           hapticPattern: 'feather',
-          onboardingCompleted: Boolean(parsed.onboardingCompleted || (parsed.userName && parsed.userName.trim().length > 0)),
+          onboardingCompleted: Boolean(parsed.onboardingCompleted || cleanedName.length > 0),
           transactions: Array.isArray(parsed.transactions) ? parsed.transactions : [],
           goals: Array.isArray(parsed.goals) ? parsed.goals : []
         };
@@ -840,7 +890,7 @@
 
     function saveState() {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        writePersistedRaw(JSON.stringify(state));
       } catch (e) {}
     }
 
@@ -1853,7 +1903,7 @@
 
     function resetAllData() {
       state = createDefaultState();
-      saveState();
+      clearPersistedRaw();
       syncWelcomeHeader();
       document.body.classList.add('onboarding-open');
       document.getElementById('welcome-screen').classList.remove('hidden');
