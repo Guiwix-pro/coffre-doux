@@ -2,7 +2,7 @@
 <html lang="fr" class="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Coffre-Doux</title>
   <meta name="theme-color" content="#141211" />
   <meta name="mobile-web-app-capable" content="yes" />
@@ -51,15 +51,16 @@
     html, body {
       margin: 0;
       padding: 0;
-      background-color: #0B0A09;
+      background-color: var(--bg-app);
       color: var(--text-main);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      min-height: 100vh;
+      min-height: 100dvh;
       overflow-x: hidden;
     }
 
-    @media (min-width: 500px) {
+    @media (min-width: 600px) {
       body {
+        background-color: #0B0A09;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -107,9 +108,9 @@
 
     .app-shell {
       width: 100%;
-      max-width: 412px;
+      max-width: 100%;
       margin: 0 auto;
-      min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
       position: relative;
@@ -117,10 +118,11 @@
       overflow-x: hidden;
     }
 
-    @media (min-width: 500px) {
+    @media (min-width: 600px) {
       .app-shell {
         width: 412px;
         min-width: 412px;
+        max-width: 412px;
         height: 820px;
         min-height: 820px;
         max-height: 92vh;
@@ -139,7 +141,7 @@
       display: grid;
       grid-template-columns: 40px 1fr 40px;
       align-items: center;
-      padding: 18px 20px 14px;
+      padding: calc(16px + env(safe-area-inset-top, 0px)) 20px 14px;
       background: rgba(20, 18, 17, 0.88);
       backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
@@ -319,7 +321,7 @@
       right: 0;
       margin: 0 auto;
       width: 100%;
-      max-width: 412px;
+      max-width: 100%;
       z-index: 30;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -330,7 +332,7 @@
       padding: 10px 12px calc(14px + env(safe-area-inset-bottom, 0px));
     }
 
-    @media (min-width: 500px) {
+    @media (min-width: 600px) {
       .bottom-nav {
         position: sticky;
         bottom: 0;
@@ -367,32 +369,54 @@
 
     .welcome-screen {
       position: fixed;
-      top: 0;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
+      inset: 0;
       width: 100%;
-      max-width: 412px;
+      max-width: 100%;
+      min-height: 100dvh;
       z-index: 50;
       background: var(--bg-app);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 26px 22px 28px 26px;
+      padding: calc(22px + env(safe-area-inset-top, 0px)) 22px calc(24px + env(safe-area-inset-bottom, 0px)) 24px;
       overflow-y: auto;
+      overflow-x: hidden;
     }
 
-    @media (min-width: 500px) {
+    @media (min-width: 600px) {
       .welcome-screen {
+        inset: auto;
         top: 50%;
-        bottom: auto;
+        left: 50%;
         transform: translate(-50%, -50%);
+        width: 412px;
+        max-width: 412px;
         height: 820px;
+        min-height: 820px;
         max-height: 92vh;
         border-radius: 38px;
         border: 1px solid var(--border-strong);
         box-shadow: 0 28px 70px rgba(0, 0, 0, 0.72), 0 0 0 1px rgba(245, 239, 234, 0.04);
       }
+    }
+
+    .welcome-aurora {
+      position: absolute;
+      top: -120px;
+      right: -110px;
+      width: 390px;
+      height: 390px;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle at 55% 42%,
+        rgba(226, 142, 118, 0.34) 0%,
+        rgba(226, 142, 118, 0.16) 36%,
+        rgba(226, 142, 118, 0.05) 62%,
+        rgba(226, 142, 118, 0) 78%
+      );
+      filter: blur(18px);
+      pointer-events: none;
+      z-index: 1;
     }
 
     .welcome-screen.hidden {
@@ -554,12 +578,14 @@
 </head>
 <body>
   <div id="welcome-screen" class="welcome-screen">
-    <svg style="position:fixed;top:-30px;right:-30px;width:240px;height:240px;pointer-events:none;opacity:0.45;" viewBox="0 0 240 240" fill="none">
-      <path d="M45 10C110 -5 215 25 235 110C250 175 180 225 115 205C55 188 15 115 45 10Z" fill="url(#welcomeWaveGrad)" />
+    <div class="welcome-aurora" aria-hidden="true"></div>
+    <svg style="position:absolute;top:0;left:0;width:100%;height:260px;pointer-events:none;z-index:1;opacity:0.55;" viewBox="0 0 420 260" preserveAspectRatio="none" fill="none" aria-hidden="true">
+      <path d="M-20 0 H440 V155 C355 215 245 110 135 165 C65 200 15 185 -20 155 Z" fill="url(#welcomeWaveGrad)" />
       <defs>
-        <linearGradient id="welcomeWaveGrad" x1="40" y1="10" x2="220" y2="200" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#E28E76" stop-opacity="0.45" />
-          <stop offset="1" stop-color="#E28E76" stop-opacity="0.03" />
+        <linearGradient id="welcomeWaveGrad" x1="340" y1="0" x2="120" y2="210" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#E28E76" stop-opacity="0.26" />
+          <stop offset="55%" stop-color="#E28E76" stop-opacity="0.08" />
+          <stop offset="100%" stop-color="#E28E76" stop-opacity="0" />
         </linearGradient>
       </defs>
     </svg>
