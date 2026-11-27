@@ -20,7 +20,7 @@
       --bg-app: #141211;
       --bg-card: #1D1A18;
       --bg-card-soft: #24201D;
-      --bg-input: #171413;
+      --bg-input: #1A1715;
       --text-main: #F5EFEA;
       --text-muted: #A69B92;
       --text-subtle: #786E66;
@@ -32,7 +32,7 @@
       --negative: #E08279;
       --negative-bg: rgba(224, 130, 121, 0.11);
       --border: rgba(245, 239, 234, 0.08);
-      --border-strong: rgba(245, 239, 234, 0.16);
+      --border-strong: rgba(245, 239, 234, 0.14);
     }
 
     * {
@@ -72,9 +72,9 @@
     }
 
     .label-caps {
-      font-size: 0.68rem;
+      font-size: 0.66rem;
       font-weight: 600;
-      letter-spacing: 0.16em;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
       color: var(--text-muted);
     }
@@ -207,16 +207,17 @@
       background: var(--text-main);
       color: var(--bg-app);
       border: none;
-      border-radius: 14px;
-      padding: 12px 18px;
+      border-radius: 16px;
+      padding: 14px 18px;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
+      letter-spacing: 0.02em;
       cursor: pointer;
       transition: transform 0.15s ease, opacity 0.15s ease;
     }
 
     .btn-cream:active {
-      transform: scale(0.97);
+      transform: scale(0.98);
     }
 
     .btn-ghost {
@@ -335,6 +336,7 @@
       background: var(--accent-soft);
     }
 
+    /* Écran d'entrée mobile épuré, centré et sobre */
     .welcome-screen {
       position: fixed;
       top: 0;
@@ -348,7 +350,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 28px 24px 36px;
+      padding: 22px 22px calc(24px + env(safe-area-inset-bottom, 0px));
       overflow-y: auto;
     }
 
@@ -367,6 +369,15 @@
 
     .welcome-screen.hidden {
       display: none;
+    }
+
+    .welcome-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 20px 18px;
+      position: relative;
+      overflow: hidden;
     }
 
     body.onboarding-open .app-shell {
@@ -405,16 +416,22 @@
       width: 100%;
       background: var(--bg-input);
       color: var(--text-main);
-      border: 1px solid var(--border-strong);
-      border-radius: 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
       padding: 11px 13px;
       font-family: inherit;
-      font-size: 0.92rem;
+      font-size: 0.9rem;
+      transition: border-color 0.18s ease, background 0.18s ease;
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: var(--text-subtle);
     }
 
     input:focus, select:focus, textarea:focus {
       outline: none;
-      border-color: var(--accent);
+      border-color: rgba(226, 142, 118, 0.55);
+      background: #1F1B18;
     }
 
     .ed-switch {
@@ -509,68 +526,55 @@
 </head>
 <body>
   <div id="welcome-screen" class="welcome-screen">
-    <svg style="position:fixed;top:-30px;right:-30px;width:240px;height:240px;pointer-events:none;opacity:0.45;" viewBox="0 0 240 240" fill="none">
-      <path d="M45 10C110 -5 215 25 235 110C250 175 180 225 115 205C55 188 15 115 45 10Z" fill="url(#welcomeWaveGrad)" />
-      <defs>
-        <linearGradient id="welcomeWaveGrad" x1="40" y1="10" x2="220" y2="200" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#E28E76" stop-opacity="0.45" />
-          <stop offset="1" stop-color="#E28E76" stop-opacity="0.03" />
-        </linearGradient>
-      </defs>
-    </svg>
-
     <div style="display:flex;align-items:center;justify-content:space-between;position:relative;z-index:2;">
-      <div style="width:42px;height:42px;border-radius:13px;background:var(--bg-card);border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;color:var(--accent);font-family:'Playfair Display',serif;font-style:italic;font-size:1.25rem;">
+      <div style="width:40px;height:40px;border-radius:12px;background:var(--bg-card);border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;color:var(--accent);font-family:'Playfair Display',serif;font-style:italic;font-size:1.18rem;">
         CD
       </div>
       <span class="label-caps" id="welcome-date-label"></span>
     </div>
 
-    <div style="position:relative;z-index:2;max-width:440px;margin:28px 0;">
-      <p class="label-caps" style="color:var(--accent);margin-bottom:10px;" id="welcome-greeting-small">PREMIER PAS</p>
-      <h1 class="font-serif-ed" style="font-size:2.05rem;line-height:1.15;font-weight:500;margin:0 0 12px;">
-        Ouvrons votre <span style="font-style:italic;color:var(--accent);">Coffre Doux.</span>
+    <div style="position:relative;z-index:2;margin:auto 0;padding:18px 0;">
+      <p class="label-caps" style="color:var(--accent);margin-bottom:8px;" id="welcome-greeting-small">PREMIER PAS</p>
+      <h1 class="font-serif-ed" style="font-size:1.85rem;line-height:1.18;font-weight:500;margin:0 0 8px;">
+        Votre <span style="font-style:italic;color:var(--accent);">Coffre Doux.</span>
       </h1>
-      <p style="color:var(--text-muted);line-height:1.55;font-size:0.9rem;margin:0 0 20px;">
-        Aucune création de compte ni serveur : tout reste privé sur votre appareil.
+      <p style="color:var(--text-muted);line-height:1.5;font-size:0.84rem;margin:0 0 18px;">
+        Un espace calme, privé et local pour suivre votre budget à votre rythme.
       </p>
 
-      <form id="onboarding-form" onsubmit="submitOnboarding(event)" style="display:flex;flex-direction:column;gap:13px;">
-        <div>
-          <label class="label-caps" style="display:block;margin-bottom:6px;">VOTRE PRÉNOM *</label>
-          <input type="text" id="onboard-name" placeholder="Ex. Camille" required />
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="welcome-card">
+        <form id="onboarding-form" onsubmit="submitOnboarding(event)" style="display:flex;flex-direction:column;gap:12px;">
           <div>
-            <label class="label-caps" style="display:block;margin-bottom:6px;">SOLDE DE DÉPART (€)</label>
-            <input type="number" id="onboard-balance" step="0.01" placeholder="0,00" />
+            <label class="label-caps" style="display:block;margin-bottom:6px;">PRÉNOM *</label>
+            <input type="text" id="onboard-name" placeholder="Ex. Camille" required />
           </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+              <label class="label-caps" style="display:block;margin-bottom:6px;">SOLDE INITIAL (€)</label>
+              <input type="number" id="onboard-balance" step="0.01" placeholder="0,00" />
+            </div>
+            <div>
+              <label class="label-caps" style="display:block;margin-bottom:6px;">CAP (€)</label>
+              <input type="number" id="onboard-goal-target" step="1" min="1" placeholder="Optionnel" />
+            </div>
+          </div>
+
           <div>
-            <label class="label-caps" style="display:block;margin-bottom:6px;">PREMIER CAP (€)</label>
-            <input type="number" id="onboard-goal-target" step="1" min="1" placeholder="Optionnel" />
+            <label class="label-caps" style="display:block;margin-bottom:6px;">PREMIÈRE ENVIE (OPTIONNELLE)</label>
+            <input type="text" id="onboard-goal-title" placeholder="Ex. Réserve douce, Week-end..." />
           </div>
-        </div>
 
-        <div>
-          <label class="label-caps" style="display:block;margin-bottom:6px;">NOM DE VOTRE ENVIE / PROJET (OPTIONNEL)</label>
-          <input type="text" id="onboard-goal-title" placeholder="Ex. Échappée en Bretagne, Réserve douce..." />
-        </div>
-
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px;">
-          <button type="button" class="btn-ghost" onclick="skipOnboarding()" style="padding:12px 16px;">
-            Passer
-          </button>
-          <button type="submit" class="btn-cream" style="flex:1;padding:14px 18px;">
+          <button type="submit" class="btn-cream" style="width:100%;margin-top:6px;">
             OUVRIR MON COFFRE →
           </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
 
-    <div style="position:relative;z-index:2;">
-      <p style="color:var(--text-subtle);font-size:0.74rem;margin:0;">
-        100 % local · Vos données ne quittent jamais cet écran.
+    <div style="position:relative;z-index:2;text-align:center;">
+      <p style="color:var(--text-subtle);font-size:0.72rem;margin:0;">
+        Stockage local uniquement · Aucun compte requis
       </p>
     </div>
   </div>
@@ -1443,14 +1447,6 @@
       }
     }
 
-    function skipOnboarding() {
-      state.onboardingCompleted = true;
-      saveState();
-      document.body.classList.remove('onboarding-open');
-      document.getElementById('welcome-screen').classList.add('hidden');
-      triggerHapticFeedback();
-    }
-
     function syncWelcomeHeader() {
       const small = document.getElementById('welcome-greeting-small');
       const dateEl = document.getElementById('welcome-date-label');
@@ -1773,13 +1769,11 @@
       ctx.save();
       ctx.scale(s, s);
 
-      // Fond cacao velouté arrondi
       ctx.fillStyle = '#1D1A18';
       ctx.beginPath();
       ctx.roundRect(0, 0, 512, 512, 118);
       ctx.fill();
 
-      // Onde organique terracotta douce en arrière-plan
       const waveGrad = ctx.createLinearGradient(250, 40, 490, 290);
       waveGrad.addColorStop(0, 'rgba(226, 142, 118, 0.28)');
       waveGrad.addColorStop(1, 'rgba(226, 142, 118, 0.02)');
@@ -1792,14 +1786,12 @@
       ctx.closePath();
       ctx.fill();
 
-      // Liseré éditorial discret
       ctx.strokeStyle = 'rgba(226, 142, 118, 0.35)';
       ctx.lineWidth = 8;
       ctx.beginPath();
       ctx.roundRect(34, 34, 444, 444, 94);
       ctx.stroke();
 
-      // Anse supérieure du coffre
       ctx.strokeStyle = '#F5EFEA';
       ctx.lineWidth = 18;
       ctx.lineCap = 'round';
@@ -1812,7 +1804,6 @@
       ctx.lineTo(320, 174);
       ctx.stroke();
 
-      // Corps principal du coffre
       ctx.fillStyle = '#24201D';
       ctx.strokeStyle = '#F5EFEA';
       ctx.lineWidth = 18;
@@ -1821,7 +1812,6 @@
       ctx.fill();
       ctx.stroke();
 
-      // Ligne horizontale douce du couvercle / porte du coffre
       ctx.strokeStyle = 'rgba(245, 239, 234, 0.28)';
       ctx.lineWidth = 8;
       ctx.beginPath();
@@ -1829,14 +1819,12 @@
       ctx.lineTo(380, 246);
       ctx.stroke();
 
-      // Petits pieds discrets sous le coffre
       ctx.fillStyle = '#F5EFEA';
       ctx.beginPath();
       ctx.roundRect(146, 396, 36, 18, 9);
       ctx.roundRect(330, 396, 36, 18, 9);
       ctx.fill();
 
-      // Médaillon central de serrure terracotta
       ctx.fillStyle = '#1D1A18';
       ctx.strokeStyle = '#E28E76';
       ctx.lineWidth = 12;
@@ -1845,7 +1833,6 @@
       ctx.fill();
       ctx.stroke();
 
-      // Trou de serrure / point d'ancrage chaleureux
       ctx.fillStyle = '#E28E76';
       ctx.beginPath();
       ctx.arc(256, 278, 10, 0, Math.PI * 2);
