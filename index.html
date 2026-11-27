@@ -8,6 +8,8 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Coffre-Doux" />
+  <link id="apple-touch-icon" rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='42' fill='%231D1A18'/%3E%3Crect x='14' y='14' width='152' height='152' rx='32' fill='none' stroke='%23E28E76' stroke-opacity='0.45' stroke-width='3.5'/%3E%3Ctext x='90' y='112' text-anchor='middle' font-family='Georgia, serif' font-style='italic' font-size='70' fill='%23E28E76'%3ECD%3C/text%3E%3C/svg%3E" />
   <link rel="manifest" href="manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1745,6 +1747,41 @@
         navigator.serviceWorker.register('./sw.js').catch(() => {});
       });
     }
+
+    // Génère une icône PNG nette pour les écrans d'accueil mobiles (Chrome / Safari)
+    (function ensureRasterAppIcons() {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Fond arrondi cacao velouté
+        ctx.fillStyle = '#1D1A18';
+        ctx.beginPath();
+        ctx.roundRect(0, 0, 512, 512, 118);
+        ctx.fill();
+
+        // Cadre intérieur terracotta discret
+        ctx.strokeStyle = 'rgba(226, 142, 118, 0.45)';
+        ctx.lineWidth = 10;
+        ctx.beginPath();
+        ctx.roundRect(38, 38, 436, 436, 92);
+        ctx.stroke();
+
+        // Monogramme CD en italique éditorial
+        ctx.fillStyle = '#E28E76';
+        ctx.font = 'italic 600 206px Georgia, "Playfair Display", serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('CD', 256, 268);
+
+        const pngUrl = canvas.toDataURL('image/png');
+        const appleIcon = document.getElementById('apple-touch-icon');
+        if (appleIcon) appleIcon.href = pngUrl;
+      } catch (e) {}
+    })();
 
     syncWelcomeHeader();
     if (state.onboardingCompleted && !state.showWelcomeOnLaunch) {
