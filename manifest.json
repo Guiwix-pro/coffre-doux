@@ -1,10 +1,10 @@
 {
 "name": "Coffre-Doux",
 "short_name": "Coffre-Doux",
-"description": "Suivi financier éditorial et rassurant",
+"description": "Un espace calme, privé et local pour suivre votre budget à votre rythme.",
 "start_url": "./index.html",
 "scope": "./",
-"display": "standalone",
+"display": "fullscreen",
 "orientation": "portrait",
 "background_color": "#141211",
 "theme_color": "#141211",
