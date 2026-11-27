@@ -1490,6 +1490,13 @@
               <input type="file" accept="application/json" style="display:none;" onchange="importJSON(event)" />
             </label>
           </div>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+            <div class="label-caps" style="margin-bottom:8px;">ICÔNES PNG POUR GITHUB / ANDROID</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button type="button" class="btn-ghost" onclick="downloadAppPngIcon(192)">Télécharger icon-192.png</button>
+              <button type="button" class="btn-ghost" onclick="downloadAppPngIcon(512)">Télécharger icon-512.png</button>
+            </div>
+          </div>
           <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
             <button type="button" class="btn-ghost" style="color:var(--negative);border-color:rgba(224,130,121,0.35);" onclick="resetAllData()">Tout remettre à zéro</button>
           </div>
@@ -1952,23 +1959,45 @@
       saveState();
     });
 
-    (function generatePngIconsForMobile() {
-      try {
-        const svgData = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><radialGradient id="bg" cx="22%" cy="18%" r="85%"><stop offset="0%" stop-color="#59392C"/><stop offset="52%" stop-color="#231915"/><stop offset="100%" stop-color="#16100E"/></radialGradient><linearGradient id="gold" x1="20%" y1="15%" x2="85%" y2="85%"><stop offset="0%" stop-color="#F7C7A3"/><stop offset="50%" stop-color="#E8A47E"/><stop offset="100%" stop-color="#C97B57"/></linearGradient></defs><rect width="512" height="512" rx="112" fill="url(#bg)"/><path d="M148 165 A148 148 0 0 1 353 145" fill="none" stroke="url(#gold)" stroke-width="7" stroke-linecap="round"/><path d="M375 174 A148 148 0 0 1 336 358" fill="none" stroke="url(#gold)" stroke-width="7" stroke-linecap="round"/><path d="M367 125 L374 149 L398 156 L374 163 L367 187 L360 163 L336 156 L360 149 Z" fill="url(#gold)"/><text x="253" y="293" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="160" fill="url(#gold)">CD</text><path d="M216 373 A40 40 0 0 1 296 373 Z" fill="url(#gold)"/><path d="M108 407 Q171 398 205 364 Q228 344 256 370 Q293 401 387 410" fill="none" stroke="url(#gold)" stroke-width="7.5" stroke-linecap="round"/><path d="M159 430 Q250 395 353 424" fill="none" stroke="url(#gold)" stroke-width="6" stroke-linecap="round"/></svg>`;
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          canvas.width = 180;
-          canvas.height = 180;
-          const ctx = canvas.getContext('2d');
-          if (!ctx) return;
-          ctx.drawImage(img, 0, 0, 180, 180);
-          const pngUrl = canvas.toDataURL('image/png');
-          const appleIcon = document.getElementById('apple-touch-icon');
-          if (appleIcon) appleIcon.setAttribute('href', pngUrl);
-        };
-        img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgData);
-      } catch (e) {}
+    const APP_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><radialGradient id="bg" cx="22%" cy="18%" r="85%"><stop offset="0%" stop-color="#59392C"/><stop offset="52%" stop-color="#231915"/><stop offset="100%" stop-color="#16100E"/></radialGradient><linearGradient id="gold" x1="20%" y1="15%" x2="85%" y2="85%"><stop offset="0%" stop-color="#F7C7A3"/><stop offset="50%" stop-color="#E8A47E"/><stop offset="100%" stop-color="#C97B57"/></linearGradient></defs><rect width="512" height="512" rx="112" fill="url(#bg)"/><path d="M148 165 A148 148 0 0 1 353 145" fill="none" stroke="url(#gold)" stroke-width="7" stroke-linecap="round"/><path d="M375 174 A148 148 0 0 1 336 358" fill="none" stroke="url(#gold)" stroke-width="7" stroke-linecap="round"/><path d="M367 125 L374 149 L398 156 L374 163 L367 187 L360 163 L336 156 L360 149 Z" fill="url(#gold)"/><text x="253" y="293" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="160" fill="url(#gold)">CD</text><path d="M216 373 A40 40 0 0 1 296 373 Z" fill="url(#gold)"/><path d="M108 407 Q171 398 205 364 Q228 344 256 370 Q293 401 387 410" fill="none" stroke="url(#gold)" stroke-width="7.5" stroke-linecap="round"/><path d="M159 430 Q250 395 353 424" fill="none" stroke="url(#gold)" stroke-width="6" stroke-linecap="round"/></svg>`;
+
+    function renderIconDataUrl(size) {
+      return new Promise((resolve) => {
+        try {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return resolve(null);
+            ctx.drawImage(img, 0, 0, size, size);
+            resolve(canvas.toDataURL('image/png'));
+          };
+          img.onerror = () => resolve(null);
+          img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(APP_ICON_SVG);
+        } catch (e) {
+          resolve(null);
+        }
+      });
+    }
+
+    async function downloadAppPngIcon(size) {
+      const pngUrl = await renderIconDataUrl(size);
+      if (!pngUrl) return;
+      const a = document.createElement('a');
+      a.href = pngUrl;
+      a.download = `icon-${size}.png`;
+      a.click();
+      showToast(`icon-${size}.png téléchargée`);
+    }
+
+    (async function generatePngIconsForMobile() {
+      const png180 = await renderIconDataUrl(180);
+      if (png180) {
+        const appleIcon = document.getElementById('apple-touch-icon');
+        if (appleIcon) appleIcon.setAttribute('href', png180);
+      }
     })();
 
     if ('serviceWorker' in navigator) {
