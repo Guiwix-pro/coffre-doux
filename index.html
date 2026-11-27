@@ -1769,77 +1769,84 @@
       ctx.save();
       ctx.scale(s, s);
 
-      ctx.fillStyle = '#1D1A18';
+      // Fond cacao velouté avec coins arrondis d'icône d'application
+      const bgGrad = ctx.createLinearGradient(0, 0, 512, 512);
+      bgGrad.addColorStop(0, '#231F1C');
+      bgGrad.addColorStop(0.55, '#191614');
+      bgGrad.addColorStop(1, '#12100F');
+      ctx.fillStyle = bgGrad;
       ctx.beginPath();
       ctx.roundRect(0, 0, 512, 512, 118);
       ctx.fill();
 
-      const waveGrad = ctx.createLinearGradient(250, 40, 490, 290);
-      waveGrad.addColorStop(0, 'rgba(226, 142, 118, 0.28)');
-      waveGrad.addColorStop(1, 'rgba(226, 142, 118, 0.02)');
-      ctx.fillStyle = waveGrad;
+      // Lueur douce terracotta dans l'angle supérieur droit
+      const glowGrad = ctx.createRadialGradient(430, 82, 10, 430, 82, 230);
+      glowGrad.addColorStop(0, 'rgba(226, 142, 118, 0.24)');
+      glowGrad.addColorStop(1, 'rgba(226, 142, 118, 0)');
+      ctx.fillStyle = glowGrad;
       ctx.beginPath();
-      ctx.moveTo(270, 38);
-      ctx.bezierCurveTo(380, 20, 488, 82, 492, 198);
-      ctx.bezierCurveTo(495, 292, 412, 340, 326, 305);
-      ctx.bezierCurveTo(246, 272, 212, 130, 270, 38);
-      ctx.closePath();
+      ctx.roundRect(0, 0, 512, 512, 118);
       ctx.fill();
 
-      ctx.strokeStyle = 'rgba(226, 142, 118, 0.35)';
+      // Bordure d'icône subtile façon cuivre chaud
+      const borderGrad = ctx.createLinearGradient(60, 20, 460, 490);
+      borderGrad.addColorStop(0, 'rgba(245, 239, 234, 0.28)');
+      borderGrad.addColorStop(0.5, 'rgba(226, 142, 118, 0.42)');
+      borderGrad.addColorStop(1, 'rgba(245, 239, 234, 0.12)');
+      ctx.strokeStyle = borderGrad;
       ctx.lineWidth = 8;
       ctx.beginPath();
-      ctx.roundRect(34, 34, 444, 444, 94);
+      ctx.roundRect(22, 22, 468, 468, 98);
       ctx.stroke();
 
-      ctx.strokeStyle = '#F5EFEA';
-      ctx.lineWidth = 18;
+      // Arc circulaire ouvert autour du monogramme CD
+      const arcGrad = ctx.createLinearGradient(110, 90, 405, 340);
+      arcGrad.addColorStop(0, '#F3C7B6');
+      arcGrad.addColorStop(0.55, '#E28E76');
+      arcGrad.addColorStop(1, 'rgba(226, 142, 118, 0.12)');
+      ctx.strokeStyle = arcGrad;
+      ctx.lineWidth = 5;
       ctx.lineCap = 'round';
       ctx.beginPath();
-      ctx.moveTo(192, 174);
-      ctx.lineTo(192, 142);
-      ctx.quadraticCurveTo(192, 112, 222, 112);
-      ctx.lineTo(290, 112);
-      ctx.quadraticCurveTo(320, 112, 320, 142);
-      ctx.lineTo(320, 174);
+      ctx.arc(256, 224, 138, Math.PI * 0.86, Math.PI * 2.16, false);
       ctx.stroke();
 
-      ctx.fillStyle = '#24201D';
-      ctx.strokeStyle = '#F5EFEA';
-      ctx.lineWidth = 18;
-      ctx.beginPath();
-      ctx.roundRect(108, 174, 296, 226, 46);
-      ctx.fill();
-      ctx.stroke();
+      // Dégradé métallique doux terracotta / crème pour le monogramme CD
+      const monoGrad = ctx.createLinearGradient(165, 135, 355, 310);
+      monoGrad.addColorStop(0, '#F5EFEA');
+      monoGrad.addColorStop(0.5, '#E89C84');
+      monoGrad.addColorStop(1, '#C9755E');
 
-      ctx.strokeStyle = 'rgba(245, 239, 234, 0.28)';
-      ctx.lineWidth = 8;
-      ctx.beginPath();
-      ctx.moveTo(132, 246);
-      ctx.lineTo(380, 246);
-      ctx.stroke();
+      // Ombre portée légère pour la profondeur éditoriale
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
+      ctx.shadowBlur = 16;
+      ctx.shadowOffsetY = 8;
+
+      ctx.fillStyle = monoGrad;
+      ctx.font = '500 132px "Playfair Display", Georgia, serif';
+      ctx.textBaseline = 'alphabetic';
+      ctx.textAlign = 'left';
+      ctx.fillText('C', 156, 248);
+      ctx.fillText('D', 248, 294);
+      ctx.restore();
+
+      // Lettrage éditorial "Coffre-Doux" en bas sans cœur
+      ctx.font = '400 44px Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.textBaseline = 'alphabetic';
+      ctx.textAlign = 'left';
+      const leftText = 'Coffre-';
+      const rightText = 'Doux';
+      const wLeft = ctx.measureText(leftText).width;
+      const wRight = ctx.measureText(rightText).width;
+      const startX = (512 - (wLeft + wRight)) / 2;
+      const baseY = 422;
 
       ctx.fillStyle = '#F5EFEA';
-      ctx.beginPath();
-      ctx.roundRect(146, 396, 36, 18, 9);
-      ctx.roundRect(330, 396, 36, 18, 9);
-      ctx.fill();
-
-      ctx.fillStyle = '#1D1A18';
-      ctx.strokeStyle = '#E28E76';
-      ctx.lineWidth = 12;
-      ctx.beginPath();
-      ctx.arc(256, 286, 42, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
+      ctx.fillText(leftText, startX, baseY);
 
       ctx.fillStyle = '#E28E76';
-      ctx.beginPath();
-      ctx.arc(256, 278, 10, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.roundRect(249, 282, 14, 24, 7);
-      ctx.fill();
+      ctx.fillText(rightText, startX + wLeft, baseY);
 
       ctx.restore();
       return canvas.toDataURL('image/png');
