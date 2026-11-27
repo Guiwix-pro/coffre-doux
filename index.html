@@ -337,7 +337,12 @@
 
     .welcome-screen {
       position: fixed;
-      inset: 0;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 412px;
       z-index: 50;
       background: var(--bg-app);
       display: flex;
@@ -345,6 +350,19 @@
       justify-content: space-between;
       padding: 28px 24px 36px;
       overflow-y: auto;
+    }
+
+    @media (min-width: 500px) {
+      .welcome-screen {
+        top: 50%;
+        bottom: auto;
+        transform: translate(-50%, -50%);
+        height: 820px;
+        max-height: 92vh;
+        border-radius: 38px;
+        border: 1px solid var(--border-strong);
+        box-shadow: 0 28px 70px rgba(0, 0, 0, 0.72), 0 0 0 1px rgba(245, 239, 234, 0.04);
+      }
     }
 
     .welcome-screen.hidden {
@@ -1744,34 +1762,137 @@
       });
     }
 
+    function buildVaultCanvasIcon(size) {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return '';
+
+      const s = size / 512;
+      ctx.save();
+      ctx.scale(s, s);
+
+      // Fond cacao velouté arrondi
+      ctx.fillStyle = '#1D1A18';
+      ctx.beginPath();
+      ctx.roundRect(0, 0, 512, 512, 118);
+      ctx.fill();
+
+      // Onde organique terracotta douce en arrière-plan
+      const waveGrad = ctx.createLinearGradient(250, 40, 490, 290);
+      waveGrad.addColorStop(0, 'rgba(226, 142, 118, 0.28)');
+      waveGrad.addColorStop(1, 'rgba(226, 142, 118, 0.02)');
+      ctx.fillStyle = waveGrad;
+      ctx.beginPath();
+      ctx.moveTo(270, 38);
+      ctx.bezierCurveTo(380, 20, 488, 82, 492, 198);
+      ctx.bezierCurveTo(495, 292, 412, 340, 326, 305);
+      ctx.bezierCurveTo(246, 272, 212, 130, 270, 38);
+      ctx.closePath();
+      ctx.fill();
+
+      // Liseré éditorial discret
+      ctx.strokeStyle = 'rgba(226, 142, 118, 0.35)';
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.roundRect(34, 34, 444, 444, 94);
+      ctx.stroke();
+
+      // Anse supérieure du coffre
+      ctx.strokeStyle = '#F5EFEA';
+      ctx.lineWidth = 18;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(192, 174);
+      ctx.lineTo(192, 142);
+      ctx.quadraticCurveTo(192, 112, 222, 112);
+      ctx.lineTo(290, 112);
+      ctx.quadraticCurveTo(320, 112, 320, 142);
+      ctx.lineTo(320, 174);
+      ctx.stroke();
+
+      // Corps principal du coffre
+      ctx.fillStyle = '#24201D';
+      ctx.strokeStyle = '#F5EFEA';
+      ctx.lineWidth = 18;
+      ctx.beginPath();
+      ctx.roundRect(108, 174, 296, 226, 46);
+      ctx.fill();
+      ctx.stroke();
+
+      // Ligne horizontale douce du couvercle / porte du coffre
+      ctx.strokeStyle = 'rgba(245, 239, 234, 0.28)';
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.moveTo(132, 246);
+      ctx.lineTo(380, 246);
+      ctx.stroke();
+
+      // Petits pieds discrets sous le coffre
+      ctx.fillStyle = '#F5EFEA';
+      ctx.beginPath();
+      ctx.roundRect(146, 396, 36, 18, 9);
+      ctx.roundRect(330, 396, 36, 18, 9);
+      ctx.fill();
+
+      // Médaillon central de serrure terracotta
+      ctx.fillStyle = '#1D1A18';
+      ctx.strokeStyle = '#E28E76';
+      ctx.lineWidth = 12;
+      ctx.beginPath();
+      ctx.arc(256, 286, 42, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Trou de serrure / point d'ancrage chaleureux
+      ctx.fillStyle = '#E28E76';
+      ctx.beginPath();
+      ctx.arc(256, 278, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.roundRect(249, 282, 14, 24, 7);
+      ctx.fill();
+
+      ctx.restore();
+      return canvas.toDataURL('image/png');
+    }
+
     (function ensureRasterAppIcons() {
       try {
-        const canvas = document.createElement('canvas');
-        canvas.width = 512;
-        canvas.height = 512;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
+        const icon192 = buildVaultCanvasIcon(192);
+        const icon512 = buildVaultCanvasIcon(512);
+        if (!icon512) return;
 
-        ctx.fillStyle = '#1D1A18';
-        ctx.beginPath();
-        ctx.roundRect(0, 0, 512, 512, 118);
-        ctx.fill();
-
-        ctx.strokeStyle = 'rgba(226, 142, 118, 0.45)';
-        ctx.lineWidth = 10;
-        ctx.beginPath();
-        ctx.roundRect(38, 38, 436, 436, 92);
-        ctx.stroke();
-
-        ctx.fillStyle = '#E28E76';
-        ctx.font = 'italic 600 206px Georgia, "Playfair Display", serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('CD', 256, 268);
-
-        const pngUrl = canvas.toDataURL('image/png');
         const appleIcon = document.getElementById('apple-touch-icon');
-        if (appleIcon) appleIcon.href = pngUrl;
+        if (appleIcon) appleIcon.href = icon512;
+
+        const favicon = document.getElementById('dynamic-favicon');
+        if (favicon) {
+          favicon.type = 'image/png';
+          favicon.href = icon192 || icon512;
+        }
+
+        const manifestLink = document.querySelector('link[rel="manifest"]');
+        if (manifestLink && icon192) {
+          const dynamicManifest = {
+            name: 'Coffre-Doux',
+            short_name: 'Coffre-Doux',
+            description: 'Suivi financier éditorial et rassurant',
+            start_url: './index.html',
+            scope: './',
+            display: 'standalone',
+            orientation: 'portrait',
+            background_color: '#141211',
+            theme_color: '#141211',
+            icons: [
+              { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any' },
+              { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any' }
+            ]
+          };
+          const blob = new Blob([JSON.stringify(dynamicManifest)], { type: 'application/manifest+json' });
+          manifestLink.href = URL.createObjectURL(blob);
+        }
       } catch (e) {}
     })();
 
