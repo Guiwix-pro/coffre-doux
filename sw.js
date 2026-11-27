@@ -1,4 +1,4 @@
-const CACHE_NAME = 'coffre-doux-v5';
+const CACHE_NAME = 'coffre-doux-v7';
 const ASSETS = ['./', './index.html', './manifest.json'];
 
 // Mise en cache des ressources essentielles à l'installation
