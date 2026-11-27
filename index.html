@@ -490,7 +490,6 @@
   </style>
 </head>
 <body>
-  <!-- Écran de premier lancement façon inscription locale (sans BDD) -->
   <div id="welcome-screen" class="welcome-screen">
     <svg style="position:fixed;top:-30px;right:-30px;width:240px;height:240px;pointer-events:none;opacity:0.45;" viewBox="0 0 240 240" fill="none">
       <path d="M45 10C110 -5 215 25 235 110C250 175 180 225 115 205C55 188 15 115 45 10Z" fill="url(#welcomeWaveGrad)" />
@@ -587,7 +586,6 @@
     </nav>
   </div>
 
-  <!-- Modale Nouvelle / Édition Mouvement -->
   <div id="tx-modal" class="modal-backdrop" onclick="if(event.target===this)closeTxModal()">
     <div class="modal-sheet">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
@@ -640,7 +638,6 @@
     </div>
   </div>
 
-  <!-- Modale Création / Ajustement Tirelire -->
   <div id="goal-modal" class="modal-backdrop" onclick="if(event.target===this)closeGoalModal()">
     <div class="modal-sheet">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
@@ -690,7 +687,6 @@
     </div>
   </div>
 
-  <!-- Notification discrète -->
   <div id="toast" class="toast-pill">Enregistré</div>
 
   <script>
@@ -1748,7 +1744,6 @@
       });
     }
 
-    // Génère une icône PNG nette pour les écrans d'accueil mobiles (Chrome / Safari)
     (function ensureRasterAppIcons() {
       try {
         const canvas = document.createElement('canvas');
@@ -1757,20 +1752,17 @@
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Fond arrondi cacao velouté
         ctx.fillStyle = '#1D1A18';
         ctx.beginPath();
         ctx.roundRect(0, 0, 512, 512, 118);
         ctx.fill();
 
-        // Cadre intérieur terracotta discret
         ctx.strokeStyle = 'rgba(226, 142, 118, 0.45)';
         ctx.lineWidth = 10;
         ctx.beginPath();
         ctx.roundRect(38, 38, 436, 436, 92);
         ctx.stroke();
 
-        // Monogramme CD en italique éditorial
         ctx.fillStyle = '#E28E76';
         ctx.font = 'italic 600 206px Georgia, "Playfair Display", serif';
         ctx.textAlign = 'center';
