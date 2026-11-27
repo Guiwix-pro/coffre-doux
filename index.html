@@ -2,330 +2,701 @@
 <html lang="fr" class="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Coffre-Doux</title>
+  <meta name="theme-color" content="#141211" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Coffre-Doux" />
-  <meta id="meta-theme-color" name="theme-color" content="#141211" />
-  <title>Coffre-Doux — Suivi Financier Éditorial</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23141211'/%3E%3Crect x='11' y='11' width='42' height='42' rx='13' fill='none' stroke='%23E28E76' stroke-width='2.6'/%3E%3Ctext x='27' y='37' text-anchor='middle' font-family='Georgia, serif' font-size='22' fill='%23E28E76'%3EC%3C/text%3E%3Ctext x='38' y='43' text-anchor='middle' font-family='Georgia, serif' font-size='22' fill='%23E28E76'%3ED%3C/text%3E%3C/svg%3E" />
-  <link rel="apple-touch-icon" href="https://placehold.co/180x180/141211/E28E76.png?text=CD" />
-  <link rel="manifest" href="./manifest.json" />
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
-      });
-    }
-  </script>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="manifest" href="manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-            serif: ['Playfair Display', 'Georgia', 'serif'],
-          }
-        }
-      }
-    };
-  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" />
+  <link id="dynamic-favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%231D1A18'/%3E%3Crect x='6' y='6' width='52' height='52' rx='14' fill='none' stroke='%23E28E76' stroke-opacity='0.45' stroke-width='1.5'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Georgia, serif' font-style='italic' font-size='26' fill='%23E28E76'%3ECD%3C/text%3E%3C/svg%3E" />
   <style>
-    /* =========================================================================
-       VARIABLES THÈME — PALETTE CACAO VELOUTÉ & CRÈME CHAUDE (ÉTAPE 1)
-       ========================================================================= */
     :root {
-      --bg-outer: #0C0B0A;
       --bg-app: #141211;
-      --bg-surface: #1D1A18;
-      --bg-surface-alt: #262220;
-      --bg-glass: rgba(20, 18, 17, 0.92);
-      --bg-input: #1D1A18;
-      --border-subtle: #2F2A27;
-      --border-strong: #453E3A;
-      --text-primary: #F5EFEA;
-      --text-secondary: #B5ABA3;
-      --text-muted: #827870;
-      --accent: #F5EFEA;
-      --accent-text: #141211;
-      --warm-accent: #E28E76;
-      --positive: #86EFAC;
-      --negative: #FCA5A5;
-      --donut-track: #262220;
+      --bg-card: #1D1A18;
+      --bg-card-soft: #24201D;
+      --bg-input: #171413;
+      --text-main: #F5EFEA;
+      --text-muted: #A69B92;
+      --text-subtle: #786E66;
+      --accent: #E28E76;
+      --accent-soft: rgba(226, 142, 118, 0.14);
+      --accent-glow: rgba(226, 142, 118, 0.24);
+      --positive: #7FB696;
+      --positive-bg: rgba(127, 182, 150, 0.11);
+      --negative: #E08279;
+      --negative-bg: rgba(224, 130, 121, 0.11);
+      --border: rgba(245, 239, 234, 0.08);
+      --border-strong: rgba(245, 239, 234, 0.16);
     }
 
-    body {
-      background-color: var(--bg-outer);
-      color: var(--text-primary);
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
 
-    #app-shell {
-      background-color: var(--bg-app);
+    *::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
     }
 
-    /* Grain éditorial ultra-discret en arrière-plan */
-    #app-shell::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0.03;
-      background-image: radial-gradient(var(--text-primary) 0.5px, transparent 0.5px);
-      background-size: 18px 18px;
-      z-index: 0;
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #0B0A09;
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    .ed-surface {
-      background-color: var(--bg-surface);
-      border-color: var(--border-subtle);
-      transition: background-color 0.2s ease, border-color 0.2s ease;
+    @media (min-width: 500px) {
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px 12px;
+      }
     }
 
-    .ed-surface-alt {
-      background-color: var(--bg-surface-alt);
-      border-color: var(--border-subtle);
+    .font-serif-ed {
+      font-family: 'Playfair Display', Georgia, serif;
     }
 
-    .ed-surface-interactive:hover {
-      background-color: var(--bg-surface-alt);
-    }
-
-    .ed-glass {
-      background-color: var(--bg-glass);
-      border-color: var(--border-subtle);
-    }
-
-    .ed-input {
-      background-color: var(--bg-input);
-      border-color: var(--border-subtle);
-      color: var(--text-primary);
-      transition: border-color 0.2s ease, background-color 0.2s ease;
-    }
-
-    .ed-input:focus {
-      outline: none;
-      border-color: var(--border-strong);
-    }
-
-    .ed-input::placeholder {
+    .label-caps {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
       color: var(--text-muted);
     }
 
-    .ed-btn-primary {
-      background-color: var(--accent);
-      color: var(--accent-text);
+    @keyframes haloBreath {
+      0%, 100% { transform: scale(0.96); opacity: 0.55; }
+      50% { transform: scale(1.06); opacity: 0.85; }
     }
 
-    .ed-text-primary { color: var(--text-primary); }
-    .ed-text-secondary { color: var(--text-secondary); }
-    .ed-text-muted { color: var(--text-muted); }
-    .ed-warm-accent { color: var(--warm-accent); }
-    .ed-border { border-color: var(--border-subtle); }
-    .ed-positive { color: var(--positive); }
-    .ed-negative { color: var(--negative); }
+    .halo-pulse {
+      animation: haloBreath 6.5s ease-in-out infinite;
+    }
 
-    /* Barres de défilement masquées */
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .app-shell {
+      width: 100%;
+      max-width: 412px;
+      margin: 0 auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background: var(--bg-app);
+      overflow-x: hidden;
+    }
 
-    /* Animations */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
+    @media (min-width: 500px) {
+      .app-shell {
+        min-height: 820px;
+        max-height: 92vh;
+        border-radius: 38px;
+        border: 1px solid var(--border-strong);
+        box-shadow: 0 28px 70px rgba(0, 0, 0, 0.72), 0 0 0 1px rgba(245, 239, 234, 0.04);
+        overflow-y: auto;
+      }
     }
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
-    @keyframes splashOut {
-      from { opacity: 1; transform: scale(1); }
-      to { opacity: 0; transform: scale(1.02); }
-    }
-    @keyframes haloPulse {
-      0%, 100% { opacity: 0.45; transform: scale(0.96); }
-      50% { opacity: 0.78; transform: scale(1.04); }
-    }
-    .animate-fade-in { animation: fadeIn 0.25s ease-out forwards; }
-    .animate-slide-up { animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    .animate-splash-out { animation: splashOut 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-    .animate-halo { animation: haloPulse 6s ease-in-out infinite; }
 
-    button, input, select, textarea {
-      -webkit-tap-highlight-color: transparent;
+    .top-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px 14px;
+      background: rgba(20, 18, 17, 0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand-logo-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      color: var(--accent);
+      cursor: pointer;
+      transition: transform 0.18s ease, border-color 0.18s ease;
+    }
+
+    .brand-logo-btn:active {
+      transform: scale(0.95);
+    }
+
+    .header-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.25rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      margin: 0;
+    }
+
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color 0.18s ease, border-color 0.18s ease;
+    }
+
+    .icon-btn:hover {
+      color: var(--text-main);
+      border-color: var(--border-strong);
+    }
+
+    #main-content {
+      flex: 1;
+      padding: 20px 20px 104px;
+    }
+
+    .ed-card {
+      position: relative;
+      overflow: hidden;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 22px;
+    }
+
+    .ed-card-soft {
+      position: relative;
+      overflow: hidden;
+      background: var(--bg-card-soft);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .organic-wave {
+      position: absolute;
+      right: -24px;
+      top: -24px;
+      width: 170px;
+      height: 170px;
+      pointer-events: none;
+      opacity: 0.55;
+    }
+
+    .btn-cream {
+      background: var(--text-main);
+      color: var(--bg-app);
+      border: none;
+      border-radius: 14px;
+      padding: 12px 18px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .btn-cream:active {
+      transform: scale(0.97);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-main);
+      border: 1px solid var(--border-strong);
+      border-radius: 14px;
+      padding: 11px 16px;
+      font-weight: 500;
+      font-size: 0.88rem;
+      cursor: pointer;
+    }
+
+    .sign-btn {
+      flex: 1;
+      height: 54px;
+      border-radius: 16px;
+      font-size: 1.5rem;
+      font-weight: 400;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .sign-btn:active {
+      transform: scale(0.97);
+    }
+
+    .sign-minus {
+      background: var(--negative-bg);
+      color: var(--negative);
+      border: 1px solid rgba(224, 130, 121, 0.25);
+    }
+
+    .sign-minus.selected {
+      border-color: var(--negative);
+      box-shadow: 0 0 0 1px var(--negative);
+    }
+
+    .sign-plus {
+      background: var(--positive-bg);
+      color: var(--positive);
+      border: 1px solid rgba(127, 182, 150, 0.25);
+    }
+
+    .sign-plus.selected {
+      border-color: var(--positive);
+      box-shadow: 0 0 0 1px var(--positive);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(245, 239, 234, 0.08);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), #F2B39F);
+      transition: width 0.35s ease;
+    }
+
+    .bottom-nav {
+      position: sticky;
+      bottom: 0;
+      margin-top: auto;
+      width: 100%;
+      z-index: 25;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      background: rgba(20, 18, 17, 0.94);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      padding: 10px 12px 14px;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      color: var(--text-subtle);
+      font-size: 0.72rem;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 12px;
+      transition: color 0.18s ease, background 0.18s ease;
+    }
+
+    .nav-item.active {
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .welcome-screen {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 412px;
+      height: 100vh;
+      z-index: 50;
+      background: var(--bg-app);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 28px 22px 32px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    @media (min-width: 500px) {
+      .welcome-screen {
+        top: 50%;
+        transform: translate(-50%, -50%);
+        height: 820px;
+        max-height: 92vh;
+        border-radius: 38px;
+        border: 1px solid var(--border-strong);
+        box-shadow: 0 28px 70px rgba(0, 0, 0, 0.72);
+      }
+    }
+
+    .welcome-screen.hidden {
+      display: none;
+    }
+
+    body.onboarding-open .app-shell {
+      display: none;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      background: rgba(10, 9, 8, 0.76);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-sheet {
+      width: 100%;
+      max-width: 380px;
+      max-height: 85vh;
+      overflow-y: auto;
+      background: var(--bg-card);
+      border-radius: 26px;
+      border: 1px solid var(--border-strong);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+      padding: 24px 20px 26px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: var(--bg-input);
+      color: var(--text-main);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      padding: 11px 13px;
+      font-family: inherit;
+      font-size: 0.92rem;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .ed-switch {
+      position: relative;
+      display: inline-block;
+      width: 42px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .ed-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+      margin: 0;
+      padding: 0;
+    }
+
+    .ed-switch-track {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: var(--bg-card-soft);
+      border: 1px solid var(--border-strong);
+      transition: background 0.22s ease, border-color 0.22s ease;
+      cursor: pointer;
+    }
+
+    .ed-switch-track::before {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      transition: transform 0.22s ease, background 0.22s ease;
+    }
+
+    .ed-switch input:checked + .ed-switch-track {
+      background: var(--accent-soft);
+      border-color: rgba(226, 142, 118, 0.5);
+    }
+
+    .ed-switch input:checked + .ed-switch-track::before {
+      transform: translate(18px, -50%);
+      background: var(--accent);
+    }
+
+    .pill-tab {
+      background: var(--bg-card);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 13px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .pill-tab.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: rgba(226, 142, 118, 0.35);
+    }
+
+    .toast-pill {
+      position: fixed;
+      bottom: 84px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 60;
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      padding: 9px 18px;
+      font-size: 0.8rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      white-space: nowrap;
+    }
+
+    .toast-pill.show {
+      opacity: 1;
     }
   </style>
 </head>
-<body class="font-sans antialiased min-h-screen flex justify-center items-center sm:p-4">
+<body>
+  <!-- Écran de premier lancement façon inscription locale (sans BDD) -->
+  <div id="welcome-screen" class="welcome-screen">
+    <svg style="position:fixed;top:-30px;right:-30px;width:240px;height:240px;pointer-events:none;opacity:0.45;" viewBox="0 0 240 240" fill="none">
+      <path d="M45 10C110 -5 215 25 235 110C250 175 180 225 115 205C55 188 15 115 45 10Z" fill="url(#welcomeWaveGrad)" />
+      <defs>
+        <linearGradient id="welcomeWaveGrad" x1="40" y1="10" x2="220" y2="200" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#E28E76" stop-opacity="0.45" />
+          <stop offset="1" stop-color="#E28E76" stop-opacity="0.03" />
+        </linearGradient>
+      </defs>
+    </svg>
 
-  <!-- Conteneur Mobile-First -->
-  <div id="app-shell" class="relative w-full sm:max-w-[430px] h-[100dvh] sm:h-[850px] sm:rounded-[2.25rem] sm:shadow-2xl sm:border ed-border flex flex-col overflow-hidden">
-
-    <!-- =====================================================================
-         1. ÉCRAN DE BIENVENUE (SPLASH / ONBOARDING D'ENTRÉE)
-         ===================================================================== -->
-    <div id="welcome-screen" style="background-color: var(--bg-app);" class="hidden absolute inset-0 z-50 flex flex-col justify-between p-8 overflow-hidden select-none">
-      <!-- Formes organiques abstraites en haut à droite -->
-      <div class="pointer-events-none absolute -top-12 -right-12 w-72 h-72 opacity-90">
-        <svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-          <defs>
-            <linearGradient id="organicGrad1" x1="20" y1="10" x2="280" y2="260" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#F2B8A2" stop-opacity="0.75" />
-              <stop offset="55%" stop-color="#D97B66" stop-opacity="0.65" />
-              <stop offset="100%" stop-color="#8B4A58" stop-opacity="0.45" />
-            </linearGradient>
-            <linearGradient id="organicGrad2" x1="60" y1="0" x2="290" y2="220" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#E8A598" stop-opacity="0.5" />
-              <stop offset="100%" stop-color="#C86D51" stop-opacity="0.3" />
-            </linearGradient>
-          </defs>
-          <path d="M90,-20 C140,45 190,35 235,85 C280,135 265,215 320,250 L320,-20 Z" fill="url(#organicGrad1)" />
-          <path d="M135,-10 C175,55 215,65 245,120 C275,175 245,235 310,275 L310,-10 Z" fill="url(#organicGrad2)" />
-        </svg>
+    <div style="display:flex;align-items:center;justify-content:space-between;position:relative;z-index:2;">
+      <div style="width:42px;height:42px;border-radius:13px;background:var(--bg-card);border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;color:var(--accent);font-family:'Playfair Display',serif;font-style:italic;font-size:1.25rem;">
+        CD
       </div>
-
-      <!-- Haut discret : logo Coffre-Doux -->
-      <div class="relative z-10 flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <svg class="w-8 h-8 shrink-0" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <rect x="4" y="4" width="40" height="40" rx="12" stroke="var(--warm-accent)" stroke-width="1.8" />
-            <text x="20" y="28.5" text-anchor="middle" font-family="'Playfair Display', Georgia, serif" font-size="18.5" font-weight="500" fill="var(--warm-accent)">C</text>
-            <text x="29" y="33.5" text-anchor="middle" font-family="'Playfair Display', Georgia, serif" font-size="18.5" font-weight="500" fill="var(--warm-accent)">D</text>
-          </svg>
-        </div>
-      </div>
-
-      <!-- Centre / Bas gauche : Salutation éditoriale & texte -->
-      <div class="relative z-10 my-auto pt-24 pr-4">
-        <p id="welcome-greeting" class="text-xs uppercase tracking-[0.26em] font-semibold ed-warm-accent mb-3">
-          HELLO
-        </p>
-        <h2 class="font-serif text-[2rem] leading-[1.18] font-normal ed-text-primary mb-5">
-          Bienvenue sur votre Coffre Doux.
-        </h2>
-        <p class="text-sm leading-relaxed ed-text-secondary font-light max-w-[290px]">
-          Suivez vos dépenses, vos revenus et gardez le contrôle de votre budget au quotidien, en toute simplicité.
-        </p>
-      </div>
-
-      <!-- Bas droite : Bouton CONTINUER -->
-      <div class="relative z-10 flex items-center justify-end pt-4">
-        <button
-          onclick="dismissWelcomeScreen()"
-          class="group inline-flex items-center gap-2 text-xs uppercase tracking-[0.22em] font-semibold ed-warm-accent py-3 px-2 hover:opacity-80 active:scale-95 transition-all"
-        >
-          <span>CONTINUER</span>
-          <span class="transition-transform group-hover:translate-x-1">→</span>
-        </button>
-      </div>
+      <span class="label-caps" id="welcome-date-label"></span>
     </div>
 
-    <!-- =====================================================================
-         2. EN-TÊTE SUPÉRIEUR MINIMALISTE
-         ===================================================================== -->
-    <header class="relative z-10 ed-glass backdrop-blur-md px-5 pt-5 pb-3 flex items-center justify-between shrink-0 border-b ed-border">
-      <div class="flex items-center gap-3">
-        <!-- Logo Coffre-Doux cliquable pour revenir à l'Accueil -->
-        <button
-          onclick="switchTab('home')"
-          aria-label="Retour à l'accueil"
-          title="Retour à l'accueil"
-          class="rounded-xl p-0.5 -m-0.5 hover:opacity-80 active:scale-95 transition-all cursor-pointer"
-        >
-          <svg class="w-9 h-9 shrink-0" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <rect x="4" y="4" width="40" height="40" rx="12" stroke="var(--warm-accent)" stroke-width="1.75" />
-            <text x="20" y="28.5" text-anchor="middle" font-family="'Playfair Display', Georgia, serif" font-size="18.5" font-weight="500" fill="var(--warm-accent)">C</text>
-            <text x="29" y="33.5" text-anchor="middle" font-family="'Playfair Display', Georgia, serif" font-size="18.5" font-weight="500" fill="var(--warm-accent)">D</text>
-          </svg>
-        </button>
+    <div style="position:relative;z-index:2;max-width:440px;margin:28px 0;">
+      <p class="label-caps" style="color:var(--accent);margin-bottom:10px;" id="welcome-greeting-small">PREMIER PAS</p>
+      <h1 class="font-serif-ed" style="font-size:2.05rem;line-height:1.15;font-weight:500;margin:0 0 12px;">
+        Ouvrons votre <span style="font-style:italic;color:var(--accent);">Coffre Doux.</span>
+      </h1>
+      <p style="color:var(--text-muted);line-height:1.55;font-size:0.9rem;margin:0 0 20px;">
+        Aucune création de compte ni serveur : tout reste privé sur votre appareil.
+      </p>
+
+      <form id="onboarding-form" onsubmit="submitOnboarding(event)" style="display:flex;flex-direction:column;gap:13px;">
+        <div>
+          <label class="label-caps" style="display:block;margin-bottom:6px;">VOTRE PRÉNOM *</label>
+          <input type="text" id="onboard-name" placeholder="Ex. Camille" required />
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label class="label-caps" style="display:block;margin-bottom:6px;">SOLDE DE DÉPART (€)</label>
+            <input type="number" id="onboard-balance" step="0.01" placeholder="0,00" />
+          </div>
+          <div>
+            <label class="label-caps" style="display:block;margin-bottom:6px;">PREMIER CAP (€)</label>
+            <input type="number" id="onboard-goal-target" step="1" min="1" placeholder="Optionnel" />
+          </div>
+        </div>
 
         <div>
-          <h1 id="header-title" class="font-serif text-xl font-medium ed-text-primary tracking-tight">Accueil</h1>
+          <label class="label-caps" style="display:block;margin-bottom:6px;">NOM DE VOTRE ENVIE / PROJET (OPTIONNEL)</label>
+          <input type="text" id="onboard-goal-title" placeholder="Ex. Échappée en Bretagne, Réserve douce..." />
         </div>
-      </div>
-    </header>
 
-    <!-- =====================================================================
-         3. ZONE DE CONTENU PRINCIPAL DYNAMIQUE (ACCUEIL / FINANCE / PLUS)
-         ===================================================================== -->
-    <main id="main-content" class="relative z-10 flex-1 overflow-y-auto no-scrollbar px-5 pt-4 pb-24">
-      <!-- Contenu injecté dynamiquement par renderActiveView() -->
-    </main>
-
-    <!-- =====================================================================
-         4. BARRE DE NAVIGATION INFÉRIEURE (3 ONGLETS ÉPURÉS)
-         ===================================================================== -->
-    <nav class="absolute bottom-0 inset-x-0 z-20 ed-glass backdrop-blur-md border-t ed-border px-4 py-2.5 flex justify-around items-center">
-      <button onclick="switchTab('finance')" id="nav-finance" class="nav-btn flex flex-col items-center justify-center w-24 py-1 transition-all">
-        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18h18M7 15l4-4 3 3 5-6" />
-        </svg>
-        <span class="text-[10px] tracking-wide font-medium">Finance</span>
-      </button>
-
-      <button onclick="switchTab('objectives')" id="nav-objectives" class="nav-btn flex flex-col items-center justify-center w-24 py-1 transition-all">
-        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18z" />
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2m0 14v2M3 12h2m14 0h2" />
-        </svg>
-        <span class="text-[10px] tracking-wide font-medium">Objectif</span>
-      </button>
-
-      <button onclick="switchTab('more')" id="nav-more" class="nav-btn flex flex-col items-center justify-center w-24 py-1 transition-all">
-        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
-        </svg>
-        <span class="text-[10px] tracking-wide font-medium">Plus</span>
-      </button>
-    </nav>
-
-    <!-- =====================================================================
-         5. MODALE (TIROIR INFÉRIEUR AJOUT / ÉDITION TRANSACTION & PROJET)
-         ===================================================================== -->
-    <div id="modal-backdrop" onclick="closeModalOnBackdrop(event)" class="hidden fixed sm:absolute inset-0 z-40 bg-black/65 backdrop-blur-xs flex items-end justify-center">
-      <div id="modal-panel" class="w-full max-h-[90%] overflow-y-auto no-scrollbar rounded-t-3xl border-t ed-border p-6 shadow-2xl animate-slide-up" style="background-color: var(--bg-app);">
-        <!-- Contenu de la modale injecté ici -->
-      </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px;">
+          <button type="button" class="btn-ghost" onclick="skipOnboarding()" style="padding:12px 16px;">
+            Passer
+          </button>
+          <button type="submit" class="btn-cream" style="flex:1;padding:14px 18px;">
+            OUVRIR MON COFFRE →
+          </button>
+        </div>
+      </form>
     </div>
 
-    <!-- Toast discret -->
-    <div id="toast" class="pointer-events-none opacity-0 transition-opacity duration-300 fixed sm:absolute bottom-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full ed-surface border ed-border shadow-lg text-xs font-medium ed-text-primary whitespace-nowrap">
-      Enregistré
+    <div style="position:relative;z-index:2;">
+      <p style="color:var(--text-subtle);font-size:0.74rem;margin:0;">
+        100 % local · Vos données ne quittent jamais cet écran.
+      </p>
     </div>
   </div>
 
+  <div class="app-shell">
+    <header class="top-header">
+      <button type="button" class="brand-logo-btn" title="Retour à l'accueil" onclick="navigateTo('home')" aria-label="Accueil">
+        <span style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.15rem;line-height:1;">CD</span>
+      </button>
+
+      <h2 class="header-title" id="header-page-title">Accueil</h2>
+
+      <div style="width:40px;height:40px;" aria-hidden="true"></div>
+    </header>
+
+    <main id="main-content"></main>
+
+    <nav class="bottom-nav" aria-label="Navigation principale">
+      <button type="button" class="nav-item" id="nav-finance" onclick="navigateTo('finance')">
+        <span style="font-size:1.05rem;">◈</span>
+        <span>Finance</span>
+      </button>
+      <button type="button" class="nav-item" id="nav-goal" onclick="navigateTo('goal')">
+        <span style="font-size:1.05rem;">✦</span>
+        <span>Objectif</span>
+      </button>
+      <button type="button" class="nav-item" id="nav-more" onclick="navigateTo('more')">
+        <span style="font-size:1.05rem;">⋯</span>
+        <span>Plus</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Modale Nouvelle / Édition Mouvement -->
+  <div id="tx-modal" class="modal-backdrop" onclick="if(event.target===this)closeTxModal()">
+    <div class="modal-sheet">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+        <h3 class="font-serif-ed" style="margin:0;font-size:1.35rem;font-weight:500;" id="tx-modal-title">Nouveau mouvement</h3>
+        <button type="button" class="icon-btn" onclick="closeTxModal()">✕</button>
+      </div>
+
+      <form id="tx-form" onsubmit="saveTransaction(event)" style="display:flex;flex-direction:column;gap:14px;">
+        <input type="hidden" id="tx-edit-id" />
+
+        <div style="display:flex;gap:12px;">
+          <button type="button" id="btn-type-expense" class="sign-btn sign-minus selected" onclick="setTxType('expense')" aria-label="Mouvement négatif">−</button>
+          <button type="button" id="btn-type-income" class="sign-btn sign-plus" onclick="setTxType('income')" aria-label="Mouvement positif">+</button>
+        </div>
+
+        <div>
+          <label class="label-caps" style="display:block;margin-bottom:6px;">MONTANT (€)</label>
+          <input type="number" id="tx-amount" step="0.01" min="0.01" placeholder="0.00" required />
+        </div>
+
+        <div>
+          <label class="label-caps" style="display:block;margin-bottom:6px;">LIBELLÉ</label>
+          <input type="text" id="tx-label" placeholder="Ex. Courses du marché, Salaire..." required />
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label class="label-caps" style="display:block;margin-bottom:6px;">CATÉGORIE</label>
+            <select id="tx-category"></select>
+          </div>
+          <div>
+            <label class="label-caps" style="display:block;margin-bottom:6px;">DATE</label>
+            <input type="date" id="tx-date" required />
+          </div>
+        </div>
+
+        <label style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 13px;border-radius:12px;background:var(--bg-input);border:1px solid var(--border);cursor:pointer;">
+          <span style="font-size:0.88rem;color:var(--text-main);">Mouvement récurrent (mensuel)</span>
+          <span class="ed-switch">
+            <input type="checkbox" id="tx-recurring" />
+            <span class="ed-switch-track"></span>
+          </span>
+        </label>
+
+        <div style="display:flex;gap:10px;margin-top:6px;">
+          <button type="button" id="btn-delete-tx" class="btn-ghost" style="display:none;color:var(--negative);border-color:rgba(224,130,121,0.35);" onclick="deleteCurrentTransaction()">Supprimer</button>
+          <button type="submit" class="btn-cream" style="flex:1;">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modale Création / Ajustement Tirelire -->
+  <div id="goal-modal" class="modal-backdrop" onclick="if(event.target===this)closeGoalModal()">
+    <div class="modal-sheet">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+        <h3 class="font-serif-ed" style="margin:0;font-size:1.35rem;font-weight:500;" id="goal-modal-title">Nouvelle tirelire</h3>
+        <button type="button" class="icon-btn" onclick="closeGoalModal()">✕</button>
+      </div>
+
+      <form id="goal-form" onsubmit="saveGoal(event)" style="display:flex;flex-direction:column;gap:14px;">
+        <input type="hidden" id="goal-edit-id" />
+
+        <div>
+          <label class="label-caps" style="display:block;margin-bottom:6px;">NOM DU PROJET OU VOYAGE</label>
+          <input type="text" id="goal-title" placeholder="Ex. Échappée en Bretagne" required />
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label class="label-caps" style="display:block;margin-bottom:6px;">MONTANT VISÉ (€)</label>
+            <input type="number" id="goal-target" step="1" min="1" placeholder="1200" required />
+          </div>
+          <div>
+            <label class="label-caps" style="display:block;margin-bottom:6px;">DÉJÀ MIS DE CÔTÉ (€)</label>
+            <input type="number" id="goal-saved" step="0.01" min="0" placeholder="0" required />
+          </div>
+        </div>
+
+        <div>
+          <label class="label-caps" style="display:block;margin-bottom:6px;">DATE CIBLE (OPTIONNELLE)</label>
+          <input type="date" id="goal-deadline" />
+        </div>
+
+        <div>
+          <label class="label-caps" style="display:block;margin-bottom:6px;">NOTES &amp; ENVIES</label>
+          <textarea id="goal-notes" rows="2" placeholder="Adresses, étapes ou petites envies..."></textarea>
+        </div>
+
+        <div>
+          <label class="label-caps" style="display:block;margin-bottom:6px;">À PRÉPARER (UNE LIGNE PAR ÉLÉMENT)</label>
+          <textarea id="goal-checklist" rows="3" placeholder="Passeport&#10;Carnet de notes&#10;Réservation train"></textarea>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:6px;">
+          <button type="button" id="btn-delete-goal" class="btn-ghost" style="display:none;color:var(--negative);border-color:rgba(224,130,121,0.35);" onclick="deleteCurrentGoal()">Retirer</button>
+          <button type="submit" class="btn-cream" style="flex:1;">Valider</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Notification discrète -->
+  <div id="toast" class="toast-pill">Enregistré</div>
+
   <script>
-    // =========================================================================
-    // 1. CONSTANTES, CATÉGORIES & ÉTAT GLOBAL (LOCALSTORAGE)
-    // =========================================================================
-    const STORAGE_KEY = 'coffre_doux_state_v1';
-
+    const STORAGE_KEY = 'coffre_doux_v4_state';
     const CATEGORIES = {
-      'Courses':      { color: '#6EE7B7', icon: 'cart' },
-      'Logement':     { color: '#E28E76', icon: 'home' },
-      'Transport':    { color: '#93C5FD', icon: 'car' },
-      'Loisirs':      { color: '#C4B5FD', icon: 'sparkle' },
-      'Santé':        { color: '#FDA4AF', icon: 'heart' },
-      'Épargne':      { color: '#FCD34D', icon: 'shield' },
-      'Salaire':      { color: '#6EE7B7', icon: 'wallet' },
-      'Autre':        { color: '#9CA3AF', icon: 'tag' }
-    };
-
-    const CATEGORY_SVG = {
-      cart: '<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />',
-      home: '<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />',
-      car: '<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />',
-      sparkle: '<path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />',
-      heart: '<path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />',
-      shield: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />',
-      wallet: '<path stroke-linecap="round" stroke-linejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3" />',
-      tag: '<path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />'
+      expense: ['Alimentation', 'Logement', 'Transport', 'Loisirs', 'Santé', 'Autre'],
+      income: ['Salaire', 'Remboursement', 'Cadeau', 'Épargne', 'Autre']
     };
 
     function getCurrentMonthISO() {
@@ -333,42 +704,49 @@
       return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     }
 
-    function createCleanData() {
-      const month = getCurrentMonthISO();
+    function getTodayISO() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    }
+
+    function createDefaultState() {
       return {
         userName: '',
+        onboardingCompleted: false,
         activeTab: 'home',
-        homeLayout: 'passport',
-        selectedMonth: month,
-        financeFilter: 'all',
-        hideBalances: false,
-        showWelcomeOnOpen: true,
-        soundEffects: true,
+        homeVariant: 'passport',
+        selectedMonth: getCurrentMonthISO(),
+        discretionMode: false,
+        soundEnabled: true,
+        showWelcomeOnLaunch: true,
         transactions: [],
-        goals: []
+        goals: [],
+        activeGoalId: null,
+        carnetSubTab: 'budget'
       };
     }
+
+    let state = loadState();
+    let currentTxType = 'expense';
+    let toastTimer = null;
 
     function loadState() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return createCleanData();
+        if (!raw) return createDefaultState();
         const parsed = JSON.parse(raw);
-        const defaults = createCleanData();
-        const rawGoals = Array.isArray(parsed.goals) ? parsed.goals : [];
-        const cleanedGoals = rawGoals.filter(g => g.id !== 'goal_demo_1' && g.id !== 'goal_demo_2');
+        const defaults = createDefaultState();
         return {
           ...defaults,
           ...parsed,
+          onboardingCompleted: Boolean(parsed.onboardingCompleted || (parsed.userName && parsed.userName.trim().length > 0)),
           transactions: Array.isArray(parsed.transactions) ? parsed.transactions : [],
-          goals: cleanedGoals
+          goals: Array.isArray(parsed.goals) ? parsed.goals : []
         };
       } catch (e) {
-        return createCleanData();
+        return createDefaultState();
       }
     }
-
-    let state = loadState();
 
     function saveState() {
       try {
@@ -376,188 +754,961 @@
       } catch (e) {}
     }
 
-    // =========================================================================
-    // 2. FEEDBACK SONORE DISCRET (WEB AUDIO API — ACCORD FEUTRÉ HARPE / MARIMBA)
-    // =========================================================================
-    function playSoftChime(type = 'save') {
-      if (!state.soundEffects) return;
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+    }
+
+    function triggerHapticFeedback() {
+      if (!state.soundEnabled) return;
       try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return;
-        const ctx = new AudioCtx();
-        const now = ctx.currentTime;
-
-        // Notes douces (arpège ascendant apaisant : Do5 -> Mi5 -> Sol5)
-        const notes = type === 'save' ? [523.25, 659.25, 783.99] : [440, 392];
-        notes.forEach((freq, idx) => {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          const startTime = now + idx * 0.055;
-          const duration = 0.34;
-
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(freq, startTime);
-
-          gain.gain.setValueAtTime(0.0001, startTime);
-          gain.gain.linearRampToValueAtTime(0.028, startTime + 0.018);
-          gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
-
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.start(startTime);
-          osc.stop(startTime + duration + 0.02);
-        });
+        if (navigator.vibrate) navigator.vibrate(12);
       } catch (e) {}
     }
 
-    // =========================================================================
-    // 3. ÉCRAN DE BIENVENUE (SPLASH SCREEN)
-    // =========================================================================
-    function syncWelcomeGreeting() {
-      const greetingEl = document.getElementById('welcome-greeting');
-      if (!greetingEl) return;
-      const cleanName = (state.userName || '').trim();
-      greetingEl.textContent = cleanName ? `HELLO ${cleanName.toUpperCase()}` : 'HELLO';
-    }
-
-    function showWelcomeScreen() {
-      const welcomeEl = document.getElementById('welcome-screen');
-      if (!welcomeEl) return;
-      syncWelcomeGreeting();
-      welcomeEl.classList.remove('hidden', 'animate-splash-out');
-    }
-
-    function dismissWelcomeScreen() {
-      const welcomeEl = document.getElementById('welcome-screen');
-      if (!welcomeEl) return;
-      playSoftChime('save');
-      welcomeEl.classList.add('animate-splash-out');
-      setTimeout(() => {
-        welcomeEl.classList.add('hidden');
-        welcomeEl.classList.remove('animate-splash-out');
-      }, 320);
-    }
-
-    // =========================================================================
-    // 4. UTILITAIRES DE FORMATAGE & CALCULS FINANCIERS
-    // =========================================================================
-    function formatCurrency(amount, showSign = false, respectPrivacy = false) {
-      if (respectPrivacy && state.hideBalances) {
-        return '•••• €';
-      }
-      const absVal = Math.abs(Number(amount) || 0);
-      const formatted = new Intl.NumberFormat('fr-FR', {
-        minimumFractionDigits: absVal % 1 === 0 ? 0 : 2,
+    function formatMoney(amount) {
+      if (state.discretionMode) return '•••• €';
+      return new Intl.NumberFormat('fr-FR', {
+        style: 'currency',
+        currency: 'EUR',
+        minimumFractionDigits: 2,
         maximumFractionDigits: 2
-      }).format(absVal);
-      if (showSign) {
-        return `${amount >= 0 ? '+' : '−'} ${formatted} €`;
-      }
-      return `${amount < 0 ? '−' : ''}${formatted} €`;
+      }).format(Number(amount || 0));
     }
 
-    function formatMonthLabel(monthISO) {
-      const [y, m] = monthISO.split('-').map(Number);
-      const date = new Date(y, m - 1, 1);
-      const label = date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+    function formatMonthLabel(ym) {
+      const [y, m] = ym.split('-').map(Number);
+      const d = new Date(y, (m || 1) - 1, 1);
+      const label = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
       return label.charAt(0).toUpperCase() + label.slice(1);
     }
 
-    function shiftMonth(monthISO, delta) {
-      const [y, m] = monthISO.split('-').map(Number);
-      const d = new Date(y, m - 1 + delta, 1);
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    function shiftMonth(delta) {
+      const [y, m] = state.selectedMonth.split('-').map(Number);
+      const d = new Date(y, (m || 1) - 1 + delta, 1);
+      state.selectedMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      saveState();
+      render();
     }
 
-    function formatShortDate(dateISO) {
-      const [y, m, d] = dateISO.split('-').map(Number);
-      const date = new Date(y, m - 1, d);
-      return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-    }
-
-    function getTransactionsForMonth(monthISO) {
+    function getCumulativeBalanceUpToMonth(ym) {
       return state.transactions
-        .filter(t => t.date && t.date.startsWith(monthISO))
-        .sort((a, b) => b.date.localeCompare(a.date));
+        .filter(t => String(t.date || '').slice(0, 7) <= ym)
+        .reduce((acc, t) => acc + (t.type === 'income' ? Number(t.amount) : -Number(t.amount)), 0);
     }
 
-    function getCumulativeBalanceUpToMonth(monthISO) {
-      return state.transactions
-        .filter(t => t.date && t.date.slice(0, 7) <= monthISO)
-        .reduce((sum, t) => sum + (t.type === 'income' ? Number(t.amount) : -Number(t.amount)), 0);
+    function getTotalAllTimeBalance() {
+      return state.transactions.reduce(
+        (acc, t) => acc + (t.type === 'income' ? Number(t.amount) : -Number(t.amount)),
+        0
+      );
     }
 
-    function getCumulativeBalanceBeforeMonth(monthISO) {
-      return state.transactions
-        .filter(t => t.date && t.date.slice(0, 7) < monthISO)
-        .reduce((sum, t) => sum + (t.type === 'income' ? Number(t.amount) : -Number(t.amount)), 0);
-    }
-
-    function getGlobalBalance() {
-      return state.transactions
-        .reduce((sum, t) => sum + (t.type === 'income' ? Number(t.amount) : -Number(t.amount)), 0);
-    }
-
-    function getMonthMetrics(monthISO) {
-      const txs = getTransactionsForMonth(monthISO);
+    function getMonthSummary(ym) {
+      const list = state.transactions.filter(t => String(t.date || '').startsWith(ym));
       let income = 0;
       let expense = 0;
-      const byCategory = {};
-
-      txs.forEach(t => {
-        const amt = Number(t.amount) || 0;
+      const categoryTotals = {};
+      list.forEach(t => {
+        const amt = Number(t.amount || 0);
         if (t.type === 'income') {
           income += amt;
         } else {
           expense += amt;
-          byCategory[t.category] = (byCategory[t.category] || 0) + amt;
+          const cat = t.category || 'Autre';
+          categoryTotals[cat] = (categoryTotals[cat] || 0) + amt;
         }
       });
-
-      const openingBalance = getCumulativeBalanceBeforeMonth(monthISO);
-      const balance = openingBalance + income - expense;
-      return { txs, income, expense, openingBalance, balance, byCategory };
+      return { income, expense, list, categoryTotals };
     }
 
-    function getWeatherInfo(income, expense) {
-      if (income === 0 && expense === 0) {
-        return {
-          status: 'Calme plat',
-          badge: 'Météo sereine',
-          color: 'var(--text-secondary)',
-          message: 'Aucune opération enregistrée ce mois-ci. Prenez le temps de poser vos repères.',
-          icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z" />'
-        };
+    function getPendingRecurringForMonth(ym) {
+      const prevYm = shiftMonthString(ym, -1);
+      const prevRecurring = state.transactions.filter(
+        t => t.recurring && String(t.date || '').startsWith(prevYm)
+      );
+      const currentList = state.transactions.filter(t => String(t.date || '').startsWith(ym));
+      return prevRecurring.filter(prev => {
+        const alreadyPresent = currentList.some(
+          cur =>
+            cur.label.trim().toLowerCase() === prev.label.trim().toLowerCase() &&
+            cur.type === prev.type &&
+            Math.abs(Number(cur.amount) - Number(prev.amount)) < 0.01
+        );
+        return !alreadyPresent;
+      });
+    }
+
+    function applyRecurringForMonth(ym) {
+      const pending = getPendingRecurringForMonth(ym);
+      if (pending.length === 0) return;
+      pending.forEach((src, i) => {
+        const dayPart = String(src.date || '2026-01-01').slice(8, 10) || '01';
+        const [y, m] = ym.split('-').map(Number);
+        const maxDay = new Date(y, m, 0).getDate();
+        const safeDay = String(Math.min(Number(dayPart) || 1, maxDay)).padStart(2, '0');
+        state.transactions.push({
+          id: `tx_${Date.now()}_${i}_${Math.random().toString(36).slice(2, 6)}`,
+          type: src.type,
+          amount: Number(src.amount),
+          label: src.label,
+          category: src.category || 'Autre',
+          date: `${ym}-${safeDay}`,
+          recurring: true
+        });
+      });
+      saveState();
+      triggerHapticFeedback();
+      render();
+      showToast(`${pending.length} mouvement${pending.length > 1 ? 's' : ''} reconduit${pending.length > 1 ? 's' : ''}`);
+    }
+
+    function getAllocatedGoalsTotal() {
+      return state.goals.reduce((sum, g) => sum + Number(g.saved || 0), 0);
+    }
+
+    function getFinancialWeather(balance) {
+      if (state.transactions.length === 0) return 'Votre coffre est prêt pour vos premiers mouvements.';
+      if (balance > 500) return 'Tout est calme et au chaud dans votre coffre.';
+      if (balance >= 0) return 'On garde le cap tout en douceur.';
+      return 'Un peu de vigilance cette période, rien d’irréversible.';
+    }
+
+    function renderOrganicWaveSVG() {
+      return `
+        <svg class="organic-wave" viewBox="0 0 180 180" fill="none">
+          <path d="M35 12C88 2 162 28 172 88C180 138 130 174 80 158C35 144 8 88 35 12Z" fill="url(#cardWaveTerracotta)" />
+          <defs>
+            <linearGradient id="cardWaveTerracotta" x1="30" y1="10" x2="165" y2="160" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#E28E76" stop-opacity="0.34" />
+              <stop offset="1" stop-color="#E28E76" stop-opacity="0.02" />
+            </linearGradient>
+          </defs>
+        </svg>
+      `;
+    }
+
+    function renderEmptySeal(text) {
+      return `
+        <div style="text-align:center;padding:28px 16px;">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" style="margin:0 auto 10px;display:block;color:var(--accent);opacity:0.75;">
+            <rect x="7" y="13" width="30" height="22" rx="7" stroke="currentColor" stroke-width="1.5" />
+            <path d="M15 13V10.5C15 8.567 16.567 7 18.5 7H25.5C27.433 7 29 8.567 29 10.5V13" stroke="currentColor" stroke-width="1.5" />
+            <circle cx="22" cy="24" r="2.5" fill="currentColor" />
+          </svg>
+          <p class="font-serif-ed" style="font-style:italic;color:var(--text-muted);margin:0;font-size:0.98rem;">${text}</p>
+        </div>
+      `;
+    }
+
+    function shiftMonthString(ym, delta) {
+      const [y, m] = ym.split('-').map(Number);
+      const d = new Date(y, (m || 1) - 1 + delta, 1);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    function renderHorizonLineSVG(ym) {
+      const openingBalance = getCumulativeBalanceUpToMonth(shiftMonthString(ym, -1));
+      const { list } = getMonthSummary(ym);
+      const sorted = [...list].sort((a, b) => String(a.date).localeCompare(String(b.date)));
+      const points = [openingBalance];
+      let running = openingBalance;
+      sorted.forEach(t => {
+        running += t.type === 'income' ? Number(t.amount) : -Number(t.amount);
+        points.push(running);
+      });
+      if (points.length === 1) points.push(openingBalance);
+
+      const minVal = Math.min(...points);
+      const maxVal = Math.max(...points);
+      const span = maxVal - minVal || 1;
+      const w = 320;
+      const h = 54;
+      const coords = points.map((val, i) => {
+        const x = (i / (points.length - 1)) * w;
+        const y = h - 8 - ((val - minVal) / span) * (h - 16);
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      });
+
+      return `
+        <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:54px;display:block;overflow:visible;">
+          <polyline fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" points="${coords.join(' ')}" />
+        </svg>
+      `;
+    }
+
+    function renderHomeView() {
+      const totalBalance = getTotalAllTimeBalance();
+      const allocated = getAllocatedGoalsTotal();
+      const freeBalance = totalBalance - allocated;
+      const pctAllocated = totalBalance > 0 ? Math.min(100, Math.max(0, Math.round((allocated / totalBalance) * 100))) : 0;
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
+      const greetingName = state.userName ? ` ${state.userName}` : '';
+
+      const balanceCardHtml = `
+        <div class="ed-card" style="margin-bottom:22px;">
+          <svg style="position:absolute;left:-20px;bottom:-30px;width:190px;height:140px;pointer-events:none;opacity:0.45;" viewBox="0 0 190 140" fill="none">
+            <path d="M-10 30C45 25 110 65 155 135L-10 140Z" fill="url(#bottomLeftTerracotta)" />
+            <defs>
+              <linearGradient id="bottomLeftTerracotta" x1="0" y1="30" x2="140" y2="140" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#E28E76" stop-opacity="0.28" />
+                <stop offset="1" stop-color="#E28E76" stop-opacity="0.02" />
+              </linearGradient>
+            </defs>
+          </svg>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;position:relative;z-index:2;">
+            <span class="label-caps">ÉQUILIBRE DU COFFRE</span>
+            <button type="button" onclick="toggleDiscretion()" style="background:none;border:none;color:var(--text-muted);font-size:0.82rem;cursor:pointer;padding:0;">
+              ${state.discretionMode ? 'Dévoiler' : 'Voiler'}
+            </button>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:14px;position:relative;z-index:2;">
+            <div>
+              <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;">Souffle disponible</div>
+              <div class="font-serif-ed" style="font-size:1.55rem;font-weight:500;color:var(--text-main);">${formatMoney(freeBalance)}</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;">Enveloppe projets</div>
+              <div class="font-serif-ed" style="font-size:1.55rem;font-weight:500;color:var(--accent);">${formatMoney(allocated)}</div>
+            </div>
+          </div>
+
+          <div class="progress-track" style="margin-bottom:10px;position:relative;z-index:2;">
+            <div class="progress-fill" style="width:${pctAllocated}%;"></div>
+          </div>
+
+          <div style="text-align:right;font-size:0.78rem;color:var(--text-muted);position:relative;z-index:2;">
+            ${pctAllocated}% de votre coffre veille sur vos envies
+          </div>
+        </div>
+      `;
+
+      const emptyProjectsHtml = `
+        <div class="ed-card" style="text-align:center;padding:30px 20px;">
+          <h3 class="font-serif-ed" style="margin:0 0 10px;font-size:1.25rem;font-weight:500;">Aucun projet en vue pour l’instant</h3>
+          <p style="color:var(--text-muted);font-size:0.86rem;line-height:1.55;margin:0 auto 20px;max-width:290px;">
+            Esquissez votre prochain voyage ou votre prochaine tirelire pour donner vie à vos envies.
+          </p>
+          <button type="button" class="btn-cream" style="border-radius:16px;padding:12px 20px;" onclick="openGoalModal()">
+            + Esquisser un projet
+          </button>
+        </div>
+      `;
+
+      const projectsSectionHtml = state.goals.length === 0
+        ? `
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <span class="label-caps">ENVIES &amp; CAPS</span>
+            <button type="button" onclick="openGoalModal()" style="background:none;border:none;color:var(--accent);font-size:0.84rem;font-weight:500;cursor:pointer;padding:0;">+ Glisser un cap</button>
+          </div>
+          ${emptyProjectsHtml}
+        `
+        : renderGoalsListSection(false);
+
+      return `
+        <div style="margin-bottom:20px;">
+          <div class="label-caps" style="color:var(--accent);margin-bottom:8px;">${dateStr}</div>
+          <h1 class="font-serif-ed" style="margin:0;font-size:1.85rem;font-weight:500;line-height:1.15;">Votre horizon serein,${greetingName}</h1>
+        </div>
+
+        ${balanceCardHtml}
+        ${projectsSectionHtml}
+      `;
+    }
+
+    function renderGoalsListSection(withCarnetTabs) {
+      const topGoal = state.goals[0] || null;
+      const others = state.goals.slice(1);
+
+      let priorityCard = '';
+      if (topGoal) {
+        const target = Math.max(Number(topGoal.target || 1), 1);
+        const saved = Number(topGoal.saved || 0);
+        const pct = Math.min(100, Math.round((saved / target) * 100));
+        let daysText = '';
+        if (topGoal.deadline) {
+          const diffDays = Math.ceil((new Date(topGoal.deadline) - new Date()) / (1000 * 60 * 60 * 24));
+          daysText = diffDays > 0 ? `Dans ${diffDays} jours` : 'Échéance atteinte';
+        }
+
+        let carnetExtra = '';
+        if (withCarnetTabs) {
+          const checklist = Array.isArray(topGoal.checklist) ? topGoal.checklist : [];
+          carnetExtra = `
+            <div style="display:flex;gap:8px;margin-top:14px;margin-bottom:10px;">
+              <button type="button" class="pill-tab ${state.carnetSubTab === 'budget' ? 'active' : ''}" onclick="setCarnetSubTab('budget')">Tirelire</button>
+              <button type="button" class="pill-tab ${state.carnetSubTab === 'prep' ? 'active' : ''}" onclick="setCarnetSubTab('prep')">À préparer (${checklist.length})</button>
+              <button type="button" class="pill-tab ${state.carnetSubTab === 'notes' ? 'active' : ''}" onclick="setCarnetSubTab('notes')">Notes</button>
+            </div>
+          `;
+          if (state.carnetSubTab === 'prep') {
+            carnetExtra += checklist.length
+              ? checklist.map((item, idx) => `
+                  <label style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:0.88rem;color:var(--text-main);">
+                    <input type="checkbox" style="width:auto;" ${item.done ? 'checked' : ''} onchange="toggleChecklistItem('${topGoal.id}', ${idx})" />
+                    <span style="${item.done ? 'text-decoration:line-through;color:var(--text-subtle);' : ''}">${escapeHtml(item.label)}</span>
+                  </label>
+                `).join('')
+              : `<p style="color:var(--text-muted);font-size:0.85rem;margin:6px 0;">Aucun élément noté pour ce départ.</p>`;
+          } else if (state.carnetSubTab === 'notes') {
+            carnetExtra += `<p style="color:var(--text-muted);font-size:0.88rem;line-height:1.5;margin:6px 0;">${escapeHtml(topGoal.notes || 'Aucune note d’itinéraire pour le moment.')}</p>`;
+          }
+        }
+
+        priorityCard = `
+          <div class="ed-card" style="margin-bottom:14px;">
+            ${renderOrganicWaveSVG()}
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <span class="label-caps" style="color:var(--accent);">CAP PRIORITAIRE</span>
+              <span style="font-size:0.78rem;color:var(--text-muted);">${daysText}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
+              <h3 class="font-serif-ed" style="margin:0;font-size:1.35rem;font-weight:500;">${escapeHtml(topGoal.title)}</h3>
+              <button type="button" class="btn-ghost" style="padding:5px 10px;font-size:0.76rem;" onclick="openGoalModal('${topGoal.id}')">Ajuster</button>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:0.85rem;color:var(--text-muted);margin-bottom:8px;">
+              <span>${formatMoney(saved)}</span>
+              <span>${pct}% · ${formatMoney(target)}</span>
+            </div>
+            <div class="progress-track" style="margin-bottom:12px;">
+              <div class="progress-fill" style="width:${pct}%;"></div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button type="button" class="btn-ghost" style="padding:7px 12px;font-size:0.8rem;" onclick="addToGoal('${topGoal.id}', 20)">+ 20 €</button>
+              <button type="button" class="btn-ghost" style="padding:7px 12px;font-size:0.8rem;" onclick="addToGoal('${topGoal.id}', 50)">+ 50 €</button>
+              <button type="button" class="btn-ghost" style="padding:7px 12px;font-size:0.8rem;" onclick="addToGoal('${topGoal.id}', 100)">+ 100 €</button>
+            </div>
+            ${carnetExtra}
+          </div>
+        `;
       }
-      const ratio = income > 0 ? expense / income : 1.2;
-      if (ratio <= 0.7) {
-        return {
-          status: 'Ciel dégagé',
-          badge: 'Météo sereine',
-          color: 'var(--positive)',
-          message: 'Vos dépenses restent bien inférieures à vos revenus ce mois-ci.',
-          icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />'
-        };
-      }
-      if (ratio <= 1.0) {
-        return {
-          status: 'Éclaircies',
-          badge: 'Équilibre fragile',
-          color: '#FBBF24',
-          message: 'Vos sorties approchent de vos rentrées. Gardez un œil doux sur les prochains jours.',
-          icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z" />'
-        };
-      }
-      return {
-        status: 'Averses passagères',
-        badge: 'Attention douce',
-        color: 'var(--negative)',
-        message: 'Vos dépenses dépassent vos revenus sur ce mois. Rien d’irrémédiable, ajustez simplement le rythme.',
-        icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z" />'
+
+      const othersHtml = others.map(g => {
+        const target = Math.max(Number(g.target || 1), 1);
+        const saved = Number(g.saved || 0);
+        const pct = Math.min(100, Math.round((saved / target) * 100));
+        return `
+          <div class="ed-card-soft" style="margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <strong style="font-size:0.95rem;font-weight:500;">${escapeHtml(g.title)}</strong>
+              <button type="button" class="btn-ghost" style="padding:4px 9px;font-size:0.74rem;" onclick="openGoalModal('${g.id}')">Ajuster</button>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:var(--text-muted);margin-bottom:6px;">
+              <span>${formatMoney(saved)} / ${formatMoney(target)}</span>
+              <span>${pct}%</span>
+            </div>
+            <div class="progress-track" style="margin-bottom:10px;">
+              <div class="progress-fill" style="width:${pct}%;"></div>
+            </div>
+            <button type="button" class="btn-ghost" style="padding:6px 11px;font-size:0.78rem;" onclick="addToGoal('${g.id}', 50)">+ 50 €</button>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span class="label-caps">VOS TIRELIRES</span>
+          <button type="button" class="btn-ghost" style="padding:6px 12px;font-size:0.78rem;" onclick="openGoalModal()">+ Nouvelle tirelire</button>
+        </div>
+        ${priorityCard}
+        ${othersHtml || (!topGoal ? `<div class="ed-card">${renderEmptySeal('Aucune tirelire ouverte pour le moment.')}</div>` : '')}
+      `;
+    }
+
+    function renderFinanceView() {
+      const cumBalance = getCumulativeBalanceUpToMonth(state.selectedMonth);
+      const { income, expense, list, categoryTotals } = getMonthSummary(state.selectedMonth);
+      const sorted = [...list].sort((a, b) => String(b.date).localeCompare(String(a.date)));
+      const pendingRecurring = getPendingRecurringForMonth(state.selectedMonth);
+
+      const recurringBannerHtml = pendingRecurring.length
+        ? `
+          <div class="ed-card-soft" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;border-color:rgba(226,142,118,0.32);">
+            <div>
+              <div class="label-caps" style="color:var(--accent);margin-bottom:3px;">MOUVEMENTS RÉCURRENTS</div>
+              <div style="font-size:0.84rem;color:var(--text-main);">
+                ${pendingRecurring.length} opération${pendingRecurring.length > 1 ? 's' : ''} mensuelle${pendingRecurring.length > 1 ? 's' : ''} à reporter
+              </div>
+            </div>
+            <button type="button" class="btn-cream" style="padding:8px 13px;font-size:0.8rem;white-space:nowrap;" onclick="applyRecurringForMonth('${state.selectedMonth}')">
+              Reconduire
+            </button>
+          </div>
+        `
+        : '';
+
+      const catEntries = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
+      const catShades = ['#E28E76', '#D4A373', '#9DB4A0', '#B5838D', '#8E9AAF', '#A69B92'];
+      const categoryBreakdownHtml = expense > 0 && catEntries.length > 0
+        ? `
+          <div class="ed-card" style="margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <span class="label-caps">RÉPARTITION DES SORTIES</span>
+              <span style="font-size:0.78rem;color:var(--text-muted);">${catEntries.length} catégorie${catEntries.length > 1 ? 's' : ''}</span>
+            </div>
+            <div style="display:flex;height:8px;border-radius:999px;overflow:hidden;background:rgba(245,239,234,0.08);margin-bottom:14px;gap:2px;">
+              ${catEntries.map(([cat, val], idx) => {
+                const pct = Math.max(4, Math.round((val / expense) * 100));
+                return `<div title="${escapeAttr(cat)} (${pct}%)" style="width:${pct}%;background:${catShades[idx % catShades.length]};"></div>`;
+              }).join('')}
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              ${catEntries.map(([cat, val], idx) => {
+                const pct = Math.round((val / expense) * 100);
+                return `
+                  <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.84rem;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="width:8px;height:8px;border-radius:999px;background:${catShades[idx % catShades.length]};display:inline-block;"></span>
+                      <span style="color:var(--text-main);">${escapeHtml(cat)}</span>
+                    </div>
+                    <div style="color:var(--text-muted);">
+                      <strong style="color:var(--text-main);font-weight:500;">${formatMoney(val)}</strong> · ${pct}%
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `
+        : '';
+
+      const txItemsHtml = sorted.length
+        ? sorted.map(t => {
+            const isIncome = t.type === 'income';
+            const recBadge = t.recurring ? ` · <span style="color:var(--accent);">↻ Mensuel</span>` : '';
+            return `
+              <div class="ed-card-soft" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;cursor:pointer;" onclick="openTxModal(null, '${t.id}')">
+                <div>
+                  <div style="font-size:0.94rem;font-weight:500;margin-bottom:3px;">${escapeHtml(t.label)}</div>
+                  <div style="font-size:0.76rem;color:var(--text-muted);">${escapeHtml(t.category || 'Autre')} · ${escapeHtml(t.date || '')}${recBadge}</div>
+                </div>
+                <div style="font-weight:600;font-size:0.96rem;color:${isIncome ? 'var(--positive)' : 'var(--negative)'};">
+                  ${isIncome ? '+' : '−'} ${formatMoney(t.amount)}
+                </div>
+              </div>
+            `;
+          }).join('')
+        : `<div class="ed-card">${renderEmptySeal('Aucun mouvement enregistré sur ce mois.')}</div>`;
+
+      return `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <button type="button" class="icon-btn" onclick="shiftMonth(-1)" aria-label="Mois précédent">‹</button>
+          <div class="font-serif-ed" style="font-size:1.2rem;font-weight:500;">${formatMonthLabel(state.selectedMonth)}</div>
+          <button type="button" class="icon-btn" onclick="shiftMonth(1)" aria-label="Mois suivant">›</button>
+        </div>
+
+        <div class="ed-card" style="margin-bottom:16px;">
+          ${renderOrganicWaveSVG()}
+          <div class="label-caps" style="margin-bottom:6px;">VOTRE COFFRE</div>
+          <div class="font-serif-ed" style="font-size:2.15rem;font-weight:500;margin-bottom:8px;">${formatMoney(cumBalance)}</div>
+          <p class="font-serif-ed" style="font-style:italic;color:var(--text-muted);margin:0 0 14px;font-size:0.92rem;">${getFinancialWeather(cumBalance)}</p>
+          ${renderHorizonLineSVG(state.selectedMonth)}
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+          <div class="ed-card-soft">
+            <div class="label-caps" style="margin-bottom:4px;">APPORTS DU MOIS</div>
+            <div style="font-size:1.05rem;font-weight:600;color:var(--positive);">+ ${formatMoney(income)}</div>
+          </div>
+          <div class="ed-card-soft">
+            <div class="label-caps" style="margin-bottom:4px;">SORTIES DU MOIS</div>
+            <div style="font-size:1.05rem;font-weight:600;color:var(--negative);">− ${formatMoney(expense)}</div>
+          </div>
+        </div>
+
+        ${recurringBannerHtml}
+        ${categoryBreakdownHtml}
+
+        <div class="ed-card" style="margin-bottom:18px;">
+          <div style="display:flex;gap:12px;">
+            <button type="button" class="sign-btn sign-minus" onclick="openTxModal('expense', null, state.selectedMonth)">−</button>
+            <button type="button" class="sign-btn sign-plus" onclick="openTxModal('income', null, state.selectedMonth)">+</button>
+          </div>
+        </div>
+
+        <div class="label-caps" style="margin-bottom:10px;">MOUVEMENTS DU MOIS</div>
+        ${txItemsHtml}
+      `;
+    }
+
+    function renderGoalTabView() {
+      return `
+        <div style="margin-bottom:16px;">
+          <h1 class="font-serif-ed" style="margin:0 0 6px;font-size:1.65rem;font-weight:500;">Passeport des envies</h1>
+          <p style="margin:0;color:var(--text-muted);font-size:0.88rem;">Faites grandir vos projets et départs à votre rythme.</p>
+        </div>
+        ${renderGoalsListSection(false)}
+      `;
+    }
+
+    function renderMoreView() {
+      return `
+        <div class="ed-card" style="margin-bottom:16px;">
+          <div class="label-caps" style="margin-bottom:10px;">PERSONNALISATION</div>
+          <label class="label-caps" style="display:block;margin-bottom:6px;">VOTRE PRÉNOM</label>
+          <input type="text" id="settings-name" value="${escapeAttr(state.userName)}" placeholder="Comment vous appelle-t-on ?" onchange="updateUserName(this.value)" style="margin-bottom:14px;" />
+
+          <label style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;cursor:pointer;">
+            <span style="font-size:0.9rem;">Écran d’accueil à l’ouverture</span>
+            <span class="ed-switch">
+              <input type="checkbox" ${state.showWelcomeOnLaunch ? 'checked' : ''} onchange="toggleWelcomeSetting(this.checked)" />
+              <span class="ed-switch-track"></span>
+            </span>
+          </label>
+
+          <label style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;cursor:pointer;">
+            <span style="font-size:0.9rem;">Vibration tactile douce</span>
+            <span class="ed-switch">
+              <input type="checkbox" ${state.soundEnabled ? 'checked' : ''} onchange="toggleSoundSetting(this.checked)" />
+              <span class="ed-switch-track"></span>
+            </span>
+          </label>
+
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+            <button type="button" class="btn-ghost" style="padding:7px 12px;font-size:0.8rem;" onclick="reopenOnboarding()">Revoir l'écran de premier pas</button>
+          </div>
+        </div>
+
+        <div class="ed-card" style="margin-bottom:16px;">
+          <div class="label-caps" style="margin-bottom:10px;">SAUVEGARDE &amp; DONNÉES</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button type="button" class="btn-ghost" onclick="exportJSON()">Exporter JSON</button>
+            <label class="btn-ghost" style="cursor:pointer;">
+              Importer JSON
+              <input type="file" accept="application/json" style="display:none;" onchange="importJSON(event)" />
+            </label>
+          </div>
+          <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+            <button type="button" class="btn-ghost" style="color:var(--negative);border-color:rgba(224,130,121,0.35);" onclick="resetAllData()">Tout remettre à zéro</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function render() {
+      const titles = {
+        home: 'Accueil',
+        finance: 'Finance',
+        goal: 'Objectif',
+        more: 'Plus'
       };
+      document.getElementById('header-page-title').textContent = titles[state.activeTab] || 'Accueil';
+
+      ['finance', 'goal', 'more'].forEach(tab => {
+        const el = document.getElementById(`nav-${tab}`);
+        if (el) el.classList.toggle('active', state.activeTab === tab);
+      });
+
+      const main = document.getElementById('main-content');
+      if (state.activeTab === 'finance') main.innerHTML = renderFinanceView();
+      else if (state.activeTab === 'goal') main.innerHTML = renderGoalTabView();
+      else if (state.activeTab === 'more') main.innerHTML = renderMoreView();
+      else main.innerHTML = renderHomeView();
     }
 
-    function escapeHTML(str) {
+    function navigateTo(tab) {
+      state.activeTab = tab;
+      saveState();
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function setHomeVariant(v) {
+      state.homeVariant = v;
+      saveState();
+      render();
+    }
+
+    function setCarnetSubTab(sub) {
+      state.carnetSubTab = sub;
+      saveState();
+      render();
+    }
+
+    function toggleDiscretion() {
+      state.discretionMode = !state.discretionMode;
+      saveState();
+      render();
+    }
+
+    function updateUserName(val) {
+      state.userName = val.trim();
+      saveState();
+      syncWelcomeHeader();
+      showToast('Prénom enregistré');
+    }
+
+    function toggleWelcomeSetting(checked) {
+      state.showWelcomeOnLaunch = checked;
+      saveState();
+    }
+
+    function toggleSoundSetting(checked) {
+      state.soundEnabled = checked;
+      saveState();
+      if (checked) triggerHapticFeedback();
+    }
+
+    function reopenOnboarding() {
+      syncWelcomeHeader();
+      document.body.classList.add('onboarding-open');
+      document.getElementById('welcome-screen').classList.remove('hidden');
+    }
+
+    function submitOnboarding(e) {
+      e.preventDefault();
+      const nameVal = (document.getElementById('onboard-name').value || '').trim();
+      const startBalance = parseFloat(document.getElementById('onboard-balance').value || '0');
+      const goalTitle = (document.getElementById('onboard-goal-title').value || '').trim();
+      const goalTarget = parseFloat(document.getElementById('onboard-goal-target').value || '0');
+
+      if (nameVal) {
+        state.userName = nameVal;
+      }
+
+      if (!isNaN(startBalance) && startBalance !== 0) {
+        state.transactions.push({
+          id: `tx_init_${Date.now()}`,
+          type: startBalance > 0 ? 'income' : 'expense',
+          amount: Math.abs(startBalance),
+          label: 'Solde initial du coffre',
+          category: startBalance > 0 ? 'Épargne' : 'Autre',
+          date: getTodayISO()
+        });
+      }
+
+      if (goalTitle) {
+        state.goals.push({
+          id: `goal_${Date.now()}`,
+          title: goalTitle,
+          target: (!isNaN(goalTarget) && goalTarget > 0) ? goalTarget : 500,
+          saved: 0,
+          deadline: '',
+          notes: '',
+          checklist: []
+        });
+      }
+
+      state.onboardingCompleted = true;
+      saveState();
+      render();
+      document.body.classList.remove('onboarding-open');
+      document.getElementById('welcome-screen').classList.add('hidden');
+      triggerHapticFeedback();
+      if (nameVal) {
+        showToast(`Bienvenue dans votre coffre, ${nameVal}`);
+      }
+    }
+
+    function skipOnboarding() {
+      state.onboardingCompleted = true;
+      saveState();
+      document.body.classList.remove('onboarding-open');
+      document.getElementById('welcome-screen').classList.add('hidden');
+      triggerHapticFeedback();
+    }
+
+    function syncWelcomeHeader() {
+      const small = document.getElementById('welcome-greeting-small');
+      const dateEl = document.getElementById('welcome-date-label');
+      const nameInput = document.getElementById('onboard-name');
+      if (small) {
+        small.textContent = state.userName ? `BONJOUR, ${state.userName.toUpperCase()}` : 'PREMIER PAS';
+      }
+      if (dateEl) {
+        dateEl.textContent = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+      }
+      if (nameInput && state.userName && !nameInput.value) {
+        nameInput.value = state.userName;
+      }
+    }
+
+    function populateCategorySelect(type, selected) {
+      const sel = document.getElementById('tx-category');
+      const list = CATEGORIES[type] || CATEGORIES.expense;
+      sel.innerHTML = list.map(c => `<option value="${escapeAttr(c)}" ${c === selected ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('');
+    }
+
+    function setTxType(type) {
+      currentTxType = type;
+      document.getElementById('btn-type-expense').classList.toggle('selected', type === 'expense');
+      document.getElementById('btn-type-income').classList.toggle('selected', type === 'income');
+      const currentCat = document.getElementById('tx-category').value;
+      populateCategorySelect(type, currentCat);
+    }
+
+    function openTxModal(defaultType = 'expense', editId = null, monthContext = null) {
+      const modal = document.getElementById('tx-modal');
+      const editInput = document.getElementById('tx-edit-id');
+      const delBtn = document.getElementById('btn-delete-tx');
+      const recurringInput = document.getElementById('tx-recurring');
+
+      if (editId) {
+        const tx = state.transactions.find(item => item.id === editId);
+        if (!tx) return;
+        document.getElementById('tx-modal-title').textContent = 'Ajuster le mouvement';
+        editInput.value = tx.id;
+        currentTxType = tx.type;
+        document.getElementById('tx-amount').value = tx.amount;
+        document.getElementById('tx-label').value = tx.label;
+        document.getElementById('tx-date').value = tx.date;
+        if (recurringInput) recurringInput.checked = Boolean(tx.recurring);
+        populateCategorySelect(tx.type, tx.category);
+        delBtn.style.display = 'inline-flex';
+      } else {
+        document.getElementById('tx-modal-title').textContent = 'Nouveau mouvement';
+        editInput.value = '';
+        currentTxType = defaultType || 'expense';
+        document.getElementById('tx-amount').value = '';
+        document.getElementById('tx-label').value = '';
+        if (recurringInput) recurringInput.checked = false;
+        let defaultDate = getTodayISO();
+        if (monthContext && monthContext !== getCurrentMonthISO()) {
+          defaultDate = `${monthContext}-01`;
+        }
+        document.getElementById('tx-date').value = defaultDate;
+        populateCategorySelect(currentTxType);
+        delBtn.style.display = 'none';
+      }
+
+      document.getElementById('btn-type-expense').classList.toggle('selected', currentTxType === 'expense');
+      document.getElementById('btn-type-income').classList.toggle('selected', currentTxType === 'income');
+      modal.classList.add('open');
+    }
+
+    function closeTxModal() {
+      document.getElementById('tx-modal').classList.remove('open');
+    }
+
+    function saveTransaction(e) {
+      e.preventDefault();
+      const editId = document.getElementById('tx-edit-id').value;
+      const amount = parseFloat(document.getElementById('tx-amount').value);
+      const label = document.getElementById('tx-label').value.trim();
+      const category = document.getElementById('tx-category').value;
+      const date = document.getElementById('tx-date').value || getTodayISO();
+      const recurring = Boolean(document.getElementById('tx-recurring')?.checked);
+
+      if (!label || isNaN(amount) || amount <= 0) return;
+
+      if (editId) {
+        const idx = state.transactions.findIndex(item => item.id === editId);
+        if (idx !== -1) {
+          state.transactions[idx] = {
+            ...state.transactions[idx],
+            type: currentTxType,
+            amount,
+            label,
+            category,
+            date,
+            recurring
+          };
+        }
+      } else {
+        state.transactions.push({
+          id: `tx_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          type: currentTxType,
+          amount,
+          label,
+          category,
+          date,
+          recurring
+        });
+      }
+
+      const txMonth = date.slice(0, 7);
+      if (/^\d{4}-\d{2}$/.test(txMonth)) {
+        state.selectedMonth = txMonth;
+      }
+
+      saveState();
+      closeTxModal();
+      triggerHapticFeedback();
+      render();
+      showToast('Mouvement enregistré');
+    }
+
+    function deleteCurrentTransaction() {
+      const editId = document.getElementById('tx-edit-id').value;
+      if (!editId) return;
+      state.transactions = state.transactions.filter(item => item.id !== editId);
+      saveState();
+      closeTxModal();
+      render();
+      showToast('Mouvement supprimé');
+    }
+
+    function openGoalModal(editId = null) {
+      const modal = document.getElementById('goal-modal');
+      const editInput = document.getElementById('goal-edit-id');
+      const delBtn = document.getElementById('btn-delete-goal');
+
+      if (editId) {
+        const g = state.goals.find(item => item.id === editId);
+        if (!g) return;
+        document.getElementById('goal-modal-title').textContent = 'Ajuster la tirelire';
+        editInput.value = g.id;
+        document.getElementById('goal-title').value = g.title || '';
+        document.getElementById('goal-target').value = g.target || '';
+        document.getElementById('goal-saved').value = g.saved || 0;
+        document.getElementById('goal-deadline').value = g.deadline || '';
+        document.getElementById('goal-notes').value = g.notes || '';
+        document.getElementById('goal-checklist').value = (g.checklist || []).map(c => c.label).join('\n');
+        delBtn.style.display = 'inline-flex';
+      } else {
+        document.getElementById('goal-modal-title').textContent = 'Nouvelle tirelire';
+        editInput.value = '';
+        document.getElementById('goal-title').value = '';
+        document.getElementById('goal-target').value = '';
+        document.getElementById('goal-saved').value = '0';
+        document.getElementById('goal-deadline').value = '';
+        document.getElementById('goal-notes').value = '';
+        document.getElementById('goal-checklist').value = '';
+        delBtn.style.display = 'none';
+      }
+
+      modal.classList.add('open');
+    }
+
+    function closeGoalModal() {
+      document.getElementById('goal-modal').classList.remove('open');
+    }
+
+    function saveGoal(e) {
+      e.preventDefault();
+      const editId = document.getElementById('goal-edit-id').value;
+      const title = document.getElementById('goal-title').value.trim();
+      const target = Math.max(1, parseFloat(document.getElementById('goal-target').value) || 1);
+      const saved = Math.max(0, parseFloat(document.getElementById('goal-saved').value) || 0);
+      const deadline = document.getElementById('goal-deadline').value;
+      const notes = document.getElementById('goal-notes').value.trim();
+      const lines = document.getElementById('goal-checklist').value
+        .split('\n')
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      if (!title) return;
+
+      if (editId) {
+        const idx = state.goals.findIndex(item => item.id === editId);
+        if (idx !== -1) {
+          const prevList = state.goals[idx].checklist || [];
+          state.goals[idx] = {
+            ...state.goals[idx],
+            title,
+            target,
+            saved,
+            deadline,
+            notes,
+            checklist: lines.map((label, i) => ({
+              label,
+              done: prevList[i] ? Boolean(prevList[i].done) : false
+            }))
+          };
+        }
+      } else {
+        state.goals.push({
+          id: `goal_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          title,
+          target,
+          saved,
+          deadline,
+          notes,
+          checklist: lines.map(label => ({ label, done: false }))
+        });
+      }
+
+      saveState();
+      closeGoalModal();
+      triggerHapticFeedback();
+      render();
+      showToast('Tirelire mise à jour');
+    }
+
+    function deleteCurrentGoal() {
+      const editId = document.getElementById('goal-edit-id').value;
+      if (!editId) return;
+      state.goals = state.goals.filter(item => item.id !== editId);
+      saveState();
+      closeGoalModal();
+      render();
+      showToast('Tirelire retirée');
+    }
+
+    function addToGoal(goalId, amount) {
+      const g = state.goals.find(item => item.id === goalId);
+      if (!g) return;
+      g.saved = Math.max(0, Number(g.saved || 0) + Number(amount || 0));
+      saveState();
+      triggerHapticFeedback();
+      render();
+      showToast(`+${amount} € ajoutés à ${g.title}`);
+    }
+
+    function toggleChecklistItem(goalId, idx) {
+      const g = state.goals.find(item => item.id === goalId);
+      if (!g || !Array.isArray(g.checklist) || !g.checklist[idx]) return;
+      g.checklist[idx].done = !g.checklist[idx].done;
+      saveState();
+      render();
+    }
+
+    function exportJSON() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `coffre-doux-${getTodayISO()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Sauvegarde exportée');
+    }
+
+    function importJSON(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          state = {
+            ...createDefaultState(),
+            ...data,
+            transactions: Array.isArray(data.transactions) ? data.transactions : [],
+            goals: Array.isArray(data.goals) ? data.goals : []
+          };
+          if (state.transactions.length > 0) {
+            const sorted = [...state.transactions].sort((a, b) => String(b.date).localeCompare(String(a.date)));
+            const lastYm = String(sorted[0].date || '').slice(0, 7);
+            if (/^\d{4}-\d{2}$/.test(lastYm)) state.selectedMonth = lastYm;
+          }
+          saveState();
+          render();
+          triggerHapticFeedback();
+          showToast('Données importées');
+        } catch (err) {}
+      };
+      reader.readAsText(file);
+    }
+
+    function resetAllData() {
+      state = createDefaultState();
+      saveState();
+      syncWelcomeHeader();
+      document.body.classList.add('onboarding-open');
+      document.getElementById('welcome-screen').classList.remove('hidden');
+      render();
+      showToast('Coffre remis à zéro');
+    }
+
+    function escapeHtml(str) {
       return String(str || '')
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
@@ -565,1267 +1716,24 @@
         .replace(/"/g, '&quot;');
     }
 
-    // =========================================================================
-    // 5. NAVIGATION & CONTRÔLES D'ÉTAT
-    // =========================================================================
-    function switchTab(tab) {
-      state.activeTab = tab;
-      saveState();
-      updateNavUI();
-      renderActiveView();
-      const mainEl = document.getElementById('main-content');
-      if (mainEl) mainEl.scrollTop = 0;
+    function escapeAttr(str) {
+      return escapeHtml(str).replace(/'/g, '&#39;');
     }
 
-    function updateNavUI() {
-      const titles = {
-        home: 'Accueil',
-        finance: 'Finance',
-        objectives: 'Objectif',
-        more: 'Plus'
-      };
-      const headerTitle = document.getElementById('header-title');
-      if (headerTitle) headerTitle.textContent = titles[state.activeTab] || 'Accueil';
-
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        const isTarget = btn.id === `nav-${state.activeTab}`;
-        btn.style.color = isTarget ? 'var(--text-primary)' : 'var(--text-muted)';
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
       });
     }
 
-    function toggleHideBalances() {
-      state.hideBalances = !state.hideBalances;
-      saveState();
-      renderActiveView();
+    syncWelcomeHeader();
+    if (state.onboardingCompleted && !state.showWelcomeOnLaunch) {
+      document.body.classList.remove('onboarding-open');
+      document.getElementById('welcome-screen').classList.add('hidden');
+    } else {
+      document.body.classList.add('onboarding-open');
     }
-
-    function changeMonth(delta) {
-      state.selectedMonth = shiftMonth(state.selectedMonth, delta);
-      saveState();
-      renderActiveView();
-    }
-
-    function setFinanceFilter(filter) {
-      state.financeFilter = filter;
-      saveState();
-      renderActiveView();
-    }
-
-    function setHomeLayout(layout) {
-      state.homeLayout = layout;
-      saveState();
-      renderActiveView();
-    }
-
-    function getTotalAllocatedToGoals() {
-      return (state.goals || []).reduce((sum, g) => sum + Number(g.savedAmount || 0), 0);
-    }
-
-    function getGoalCountdownInfo(deadlineISO) {
-      if (!deadlineISO) return null;
-      const now = new Date();
-      now.setHours(0, 0, 0, 0);
-      const target = new Date(deadlineISO + 'T00:00:00');
-      const diffMs = target - now;
-      const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-      const months = Math.max(1, Math.round(days / 30.4));
-      return { days, months };
-    }
-
-    function quickAddGoalFunds(goalId, delta) {
-      const goal = state.goals.find(g => g.id === goalId);
-      if (!goal) return;
-      goal.savedAmount = Math.max(0, Number(goal.savedAmount || 0) + delta);
-      saveState();
-      playSoftChime('save');
-      renderActiveView();
-      showToast(delta > 0 ? `+${delta} € mis de côté pour « ${goal.title} »` : `${delta} € retirés de « ${goal.title} »`);
-    }
-
-    function setGoalCardTab(goalId, tabName) {
-      const goal = state.goals.find(g => g.id === goalId);
-      if (!goal) return;
-      goal.activeTab = tabName;
-      saveState();
-      renderActiveView();
-    }
-
-    function toggleGoalChecklistItem(goalId, itemId) {
-      const goal = state.goals.find(g => g.id === goalId);
-      if (!goal || !Array.isArray(goal.checklist)) return;
-      const item = goal.checklist.find(c => c.id === itemId);
-      if (item) {
-        item.done = !item.done;
-        saveState();
-        playSoftChime('save');
-        renderActiveView();
-      }
-    }
-
-    function addGoalChecklistItem(e, goalId) {
-      e.preventDefault();
-      const input = e.target.querySelector('input');
-      const text = (input.value || '').trim();
-      if (!text) return;
-      const goal = state.goals.find(g => g.id === goalId);
-      if (!goal) return;
-      if (!Array.isArray(goal.checklist)) goal.checklist = [];
-      goal.checklist.push({ id: 'chk_' + Date.now(), text, done: false });
-      saveState();
-      renderActiveView();
-    }
-
-    function updateGoalNotes(goalId, val) {
-      const goal = state.goals.find(g => g.id === goalId);
-      if (!goal) return;
-      goal.notes = val;
-      saveState();
-    }
-
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      if (!toast) return;
-      toast.textContent = msg;
-      toast.classList.remove('opacity-0');
-      toast.classList.add('opacity-100');
-      clearTimeout(window._toastTimer);
-      window._toastTimer = setTimeout(() => {
-        toast.classList.remove('opacity-100');
-        toast.classList.add('opacity-0');
-      }, 2200);
-    }
-
-    // =========================================================================
-    // 6. RENDU DES VUES (ACCUEIL / FINANCE / PLUS)
-    // =========================================================================
-    function renderActiveView() {
-      const container = document.getElementById('main-content');
-      if (!container) return;
-      if (state.activeTab === 'objectives') {
-        container.innerHTML = renderObjectivesPassportView();
-      } else if (state.activeTab === 'home') {
-        container.innerHTML = renderHomeView();
-      } else if (state.activeTab === 'finance') {
-        container.innerHTML = renderFinanceView();
-      } else {
-        container.innerHTML = renderMoreView();
-      }
-    }
-
-    function renderObjectivesPassportView() {
-      const goals = state.goals || [];
-      const priorityGoal = goals.find(g => g.priority) || goals[0];
-      const otherGoals = goals.filter(g => priorityGoal && g.id !== priorityGoal.id);
-
-      const emptyGoalsBlock = `
-        <div class="p-6 rounded-3xl ed-surface border ed-border text-center space-y-3">
-          <p class="font-serif text-lg ed-text-primary">Aucun projet en vue pour l’instant</p>
-          <p class="text-xs ed-text-secondary leading-relaxed">Esquissez votre prochain voyage ou votre prochaine tirelire pour donner vie à vos envies.</p>
-          <button onclick="openGoalModal()" class="ed-btn-primary text-xs font-medium px-4 py-2.5 rounded-xl">
-            + Esquisser un projet
-          </button>
-        </div>
-      `;
-
-      let heroHTML = '';
-      if (priorityGoal) {
-        const pct = Math.min(100, Math.round((priorityGoal.savedAmount / (priorityGoal.targetAmount || 1)) * 100));
-        const remaining = Math.max(0, priorityGoal.targetAmount - priorityGoal.savedAmount);
-        const countdown = getGoalCountdownInfo(priorityGoal.deadline);
-        const perMonth = (countdown && remaining > 0) ? Math.ceil(remaining / countdown.months) : 0;
-
-        heroHTML = `
-          <section class="relative overflow-hidden p-5 rounded-3xl ed-surface border ed-border space-y-4">
-            <!-- Onde organique feutrée signature -->
-            <div class="pointer-events-none absolute -top-8 -right-8 w-52 h-52 opacity-45">
-              <svg viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-                <defs>
-                  <linearGradient id="cardWaveGoal" x1="20" y1="0" x2="220" y2="210" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stop-color="#F2B8A2" stop-opacity="0.32" />
-                    <stop offset="60%" stop-color="#D97B66" stop-opacity="0.16" />
-                    <stop offset="100%" stop-color="#8B4A58" stop-opacity="0" />
-                  </linearGradient>
-                </defs>
-                <path d="M60,-15 C105,35 145,28 182,68 C220,108 205,172 250,200 L250,-15 Z" fill="url(#cardWaveGoal)" />
-                <path d="M105,-10 C138,42 170,50 194,95 C218,140 192,190 245,220 L245,-10 Z" fill="url(#cardWaveGoal)" opacity="0.65" />
-              </svg>
-            </div>
-            <div style="background: radial-gradient(circle, rgba(226,142,118,0.16) 0%, transparent 70%);" class="pointer-events-none absolute -top-12 -right-12 w-44 h-44 rounded-full animate-halo"></div>
-
-            <div class="relative z-10 flex items-start justify-between gap-2">
-              <div>
-                <span class="inline-block text-[10px] uppercase tracking-[0.2em] ed-warm-accent font-semibold mb-1">
-                  CAP PRIORITAIRE · ${escapeHTML(priorityGoal.category || 'Voyage')}
-                </span>
-                <h2 class="font-serif text-2xl font-medium ed-text-primary leading-snug">
-                  ${escapeHTML(priorityGoal.title)}
-                </h2>
-              </div>
-              <button onclick="openGoalModal('${priorityGoal.id}')" class="text-[11px] ed-text-muted hover:ed-text-primary px-2 py-1 rounded-lg ed-surface-alt border ed-border">
-                Ajuster
-              </button>
-            </div>
-
-            ${countdown ? `
-              <div class="relative z-10 flex flex-wrap items-center gap-2 text-[11px] ed-text-secondary">
-                <span class="px-2.5 py-1 rounded-full ed-surface-alt border ed-border">
-                  ${countdown.days > 0 ? `Départ dans <strong class="ed-text-primary font-medium">${countdown.days} jours</strong>` : 'Le grand jour est là'}
-                </span>
-                ${perMonth > 0 ? `
-                  <span class="px-2.5 py-1 rounded-full ed-surface-alt border ed-border">
-                    Rythme doux : <strong class="ed-warm-accent font-medium">${formatCurrency(perMonth, false, true)}/mois</strong>
-                  </span>
-                ` : ''}
-              </div>
-            ` : ''}
-
-            <div class="relative z-10 space-y-2">
-              <div class="flex items-baseline justify-between">
-                <span class="font-serif text-xl font-medium ed-text-primary">${formatCurrency(priorityGoal.savedAmount, false, true)}</span>
-                <span class="text-xs ed-text-muted">sur ${formatCurrency(priorityGoal.targetAmount, false, true)} (${pct}%)</span>
-              </div>
-              <div class="w-full h-2 rounded-full overflow-hidden" style="background-color: var(--bg-surface-alt);">
-                <div style="width: ${pct}%; background-color: var(--warm-accent);" class="h-full rounded-full transition-all duration-500"></div>
-              </div>
-            </div>
-
-            <div class="relative z-10 grid grid-cols-3 gap-2 pt-1">
-              <button onclick="quickAddGoalFunds('${priorityGoal.id}', 20)" class="py-2 rounded-xl ed-surface-alt border ed-border text-xs font-medium ed-positive hover:border-[#6EE7B7]/50 active:scale-95 transition-all">
-                + 20 €
-              </button>
-              <button onclick="quickAddGoalFunds('${priorityGoal.id}', 50)" class="py-2 rounded-xl ed-surface-alt border ed-border text-xs font-medium ed-positive hover:border-[#6EE7B7]/50 active:scale-95 transition-all">
-                + 50 €
-              </button>
-              <button onclick="quickAddGoalFunds('${priorityGoal.id}', 100)" class="py-2 rounded-xl ed-surface-alt border ed-border text-xs font-medium ed-positive hover:border-[#6EE7B7]/50 active:scale-95 transition-all">
-                + 100 €
-              </button>
-            </div>
-          </section>
-        `;
-      }
-
-      return `
-        <div class="space-y-5 animate-fade-in">
-          ${goals.length === 0 ? emptyGoalsBlock : `
-            ${heroHTML}
-
-            <section class="space-y-3">
-              <div class="flex items-center justify-between">
-                <p class="text-[11px] uppercase tracking-[0.2em] ed-text-secondary font-medium">Vos tirelires</p>
-                <button onclick="openGoalModal()" class="text-xs ed-warm-accent font-medium hover:opacity-80">
-                  + Nouvelle tirelire
-                </button>
-              </div>
-
-              ${otherGoals.length === 0 ? `
-                <p class="text-xs ed-text-muted">Ajoutez une autre escapade ou une réserve douce pour faire grandir plusieurs envies à votre rythme.</p>
-              ` : `
-                <div class="space-y-2.5">
-                  ${otherGoals.map(g => {
-                    const pct = Math.min(100, Math.round((g.savedAmount / (g.targetAmount || 1)) * 100));
-                    return `
-                      <div class="p-4 rounded-2xl ed-surface border ed-border space-y-2.5">
-                        <div class="flex items-center justify-between">
-                          <div onclick="openGoalModal('${g.id}')" class="cursor-pointer">
-                            <p class="text-sm font-medium ed-text-primary">${escapeHTML(g.title)}</p>
-                            <p class="text-[11px] ed-text-muted">${formatCurrency(g.savedAmount, false, true)} / ${formatCurrency(g.targetAmount, false, true)}</p>
-                          </div>
-                          <button onclick="quickAddGoalFunds('${g.id}', 50)" class="px-3 py-1.5 rounded-xl ed-surface-alt border ed-border text-xs font-medium ed-positive hover:border-[#6EE7B7]/50 active:scale-95 transition-all">
-                            + 50 €
-                          </button>
-                        </div>
-                        <div class="w-full h-1.5 rounded-full overflow-hidden" style="background-color: var(--bg-surface-alt);">
-                          <div style="width: ${pct}%; background-color: var(--warm-accent);" class="h-full rounded-full transition-all duration-500"></div>
-                        </div>
-                      </div>
-                    `;
-                  }).join('')}
-                </div>
-              `}
-            </section>
-          `}
-        </div>
-      `;
-    }
-
-    function renderHomeView() {
-      const layout = state.homeLayout || 'roadbook';
-      const globalBalance = getGlobalBalance();
-      const totalAllocated = getTotalAllocatedToGoals();
-      const freeReserve = globalBalance - totalAllocated;
-      const goals = state.goals || [];
-      const cleanName = (state.userName || '').trim();
-      const todayLabel = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
-      const formattedToday = todayLabel.charAt(0).toUpperCase() + todayLabel.slice(1);
-
-      const layoutSwitcher = `
-        <div class="p-1 rounded-2xl ed-surface border ed-border grid grid-cols-2 gap-1">
-          ${[
-            { id: 'roadbook', label: 'Carnet' },
-            { id: 'horizon', label: 'Horizon' }
-          ].map(opt => `
-            <button
-              onclick="setHomeLayout('${opt.id}')"
-              class="py-2 px-2 rounded-xl text-[11px] font-medium transition-all ${layout === opt.id ? 'ed-btn-primary shadow-xs' : 'ed-text-secondary hover:ed-text-primary'}"
-            >
-              ${opt.label}
-            </button>
-          `).join('')}
-        </div>
-      `;
-
-      const emptyGoalsBlock = `
-        <div class="p-6 rounded-3xl ed-surface border ed-border text-center space-y-3">
-          <p class="font-serif text-lg ed-text-primary">Aucun projet en vue pour l’instant</p>
-          <p class="text-xs ed-text-secondary leading-relaxed">Esquissez votre prochain voyage ou votre prochaine tirelire pour donner vie à vos envies.</p>
-          <button onclick="openGoalModal()" class="ed-btn-primary text-xs font-medium px-4 py-2.5 rounded-xl">
-            + Esquisser un projet
-          </button>
-        </div>
-      `;
-
-      // =======================================================================
-      // LE CARNET DE ROUTE (BUDGET + CHECK-LIST + NOTES)
-      // =======================================================================
-      if (layout === 'roadbook') {
-        return `
-          <div class="space-y-5 animate-fade-in">
-            ${layoutSwitcher}
-
-            <!-- Bandeau Réserve Libre -->
-            <section class="p-4 rounded-2xl ed-surface border ed-border flex items-center justify-between">
-              <div>
-                <p class="text-[10px] uppercase tracking-[0.2em] ed-text-muted font-medium">Souffle libre (hors projets)</p>
-                <p class="font-serif text-xl font-medium ${freeReserve < 0 ? 'ed-negative' : 'ed-text-primary'} mt-0.5">
-                  ${formatCurrency(freeReserve, false, true)}
-                </p>
-              </div>
-              <button onclick="openGoalModal()" class="px-3.5 py-2 rounded-xl ed-btn-primary text-xs font-medium active:scale-95 transition-transform">
-                + Escapade
-              </button>
-            </section>
-
-            ${goals.length === 0 ? emptyGoalsBlock : `
-              <div class="space-y-4">
-                ${goals.map(g => {
-                  const tab = g.activeTab || 'budget';
-                  const pct = Math.min(100, Math.round((g.savedAmount / (g.targetAmount || 1)) * 100));
-                  const checklist = Array.isArray(g.checklist) ? g.checklist : [];
-                  const doneCount = checklist.filter(c => c.done).length;
-
-                  return `
-                    <article class="p-4 rounded-3xl ed-surface border ed-border space-y-3.5">
-                      <div class="flex items-start justify-between">
-                        <div>
-                          <span class="text-[10px] uppercase tracking-[0.2em] ed-warm-accent font-semibold">${escapeHTML(g.category || 'Voyage')}</span>
-                          <h3 class="font-serif text-xl font-medium ed-text-primary">${escapeHTML(g.title)}</h3>
-                        </div>
-                        <button onclick="openGoalModal('${g.id}')" class="text-[11px] ed-text-muted hover:ed-text-primary">Ajuster</button>
-                      </div>
-
-                      <!-- Mini onglets du Carnet -->
-                      <div class="flex gap-1.5 border-b ed-border pb-2.5">
-                        ${[
-                          { id: 'budget', label: `Tirelire (${pct}%)` },
-                          { id: 'checklist', label: `Préparatifs (${doneCount}/${checklist.length})` },
-                          { id: 'notes', label: 'Carnet' }
-                        ].map(t => `
-                          <button
-                            onclick="setGoalCardTab('${g.id}', '${t.id}')"
-                            class="px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors ${tab === t.id ? 'ed-btn-primary' : 'ed-surface-alt ed-text-secondary'}"
-                          >
-                            ${t.label}
-                          </button>
-                        `).join('')}
-                      </div>
-
-                      ${tab === 'budget' ? `
-                        <div class="space-y-2.5">
-                          <div class="flex justify-between text-xs">
-                            <span class="ed-text-primary font-medium">${formatCurrency(g.savedAmount, false, true)}</span>
-                            <span class="ed-text-muted">Cap : ${formatCurrency(g.targetAmount, false, true)}</span>
-                          </div>
-                          <div class="w-full h-2 rounded-full overflow-hidden" style="background-color: var(--bg-surface-alt);">
-                            <div style="width: ${pct}%; background-color: var(--warm-accent);" class="h-full rounded-full"></div>
-                          </div>
-                          <div class="flex gap-2 pt-1">
-                            <button onclick="quickAddGoalFunds('${g.id}', -20)" class="px-3 py-1.5 rounded-xl ed-surface-alt border ed-border text-xs ed-negative">− 20 €</button>
-                            <button onclick="quickAddGoalFunds('${g.id}', 50)" class="flex-1 py-1.5 rounded-xl ed-surface-alt border ed-border text-xs font-medium ed-positive">+ Glisser 50 €</button>
-                          </div>
-                        </div>
-                      ` : ''}
-
-                      ${tab === 'checklist' ? `
-                        <div class="space-y-2">
-                          ${checklist.map(item => `
-                            <div onclick="toggleGoalChecklistItem('${g.id}', '${item.id}')" class="flex items-center gap-2.5 p-2 rounded-xl ed-surface-alt cursor-pointer">
-                              <span class="w-4 h-4 rounded-md border ed-border flex items-center justify-center text-[10px] ${item.done ? 'ed-btn-primary' : ''}">
-                                ${item.done ? '✓' : ''}
-                              </span>
-                              <span class="text-xs ${item.done ? 'line-through ed-text-muted' : 'ed-text-primary'}">${escapeHTML(item.text)}</span>
-                            </div>
-                          `).join('')}
-                          <form onsubmit="addGoalChecklistItem(event, '${g.id}')" class="flex gap-1.5 pt-1">
-                            <input type="text" placeholder="Noter un petit préparatif..." class="flex-1 text-xs px-3 py-2 rounded-xl ed-input border" />
-                            <button type="submit" class="px-3 py-2 rounded-xl ed-surface-alt border ed-border text-xs font-medium ed-warm-accent">+</button>
-                          </form>
-                        </div>
-                      ` : ''}
-
-                      ${tab === 'notes' ? `
-                        <textarea
-                          rows="3"
-                          oninput="updateGoalNotes('${g.id}', this.value)"
-                          placeholder="Adresses douces, idées de balades, envies d'itinéraire..."
-                          class="w-full text-xs p-3 rounded-xl ed-input border leading-relaxed"
-                        >${escapeHTML(g.notes || '')}</textarea>
-                      ` : ''}
-                    </article>
-                  `;
-                }).join('')}
-              </div>
-            `}
-          </div>
-        `;
-      }
-
-      // =======================================================================
-      // PROPOSITION 3 : L'HORIZON SEREIN (BALANCE D'ÉQUILIBRE & LIGNES MAGAZINE)
-      // =======================================================================
-      const allocRatio = globalBalance > 0 ? Math.min(100, Math.round((totalAllocated / globalBalance) * 100)) : 0;
-
-      return `
-        <div class="space-y-6 animate-fade-in">
-          ${layoutSwitcher}
-
-          <!-- Salutation éditoriale -->
-          <div class="pt-1">
-            <p class="text-[11px] uppercase tracking-[0.22em] ed-warm-accent font-semibold">${formattedToday}</p>
-            <h2 class="font-serif text-2xl font-normal ed-text-primary mt-1">
-              ${cleanName ? `Douce journée ${escapeHTML(cleanName)},` : 'Votre horizon serein,'}
-            </h2>
-          </div>
-
-          <!-- Balance d'Équilibre : Disponible vs Projets -->
-          <section class="relative overflow-hidden p-5 rounded-3xl ed-surface border ed-border space-y-4">
-            <!-- Onde organique feutrée signature -->
-            <div class="pointer-events-none absolute -bottom-10 -left-10 w-56 h-44 opacity-40">
-              <svg viewBox="0 0 240 180" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-                <defs>
-                  <linearGradient id="cardWaveHorizon" x1="0" y1="180" x2="220" y2="20" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stop-color="#E28E76" stop-opacity="0.28" />
-                    <stop offset="100%" stop-color="#8B4A58" stop-opacity="0" />
-                  </linearGradient>
-                </defs>
-                <path d="M-10,65 C45,55 75,95 125,115 C175,135 200,165 240,190 L-10,190 Z" fill="url(#cardWaveHorizon)" />
-              </svg>
-            </div>
-
-            <div class="relative z-10 flex items-center justify-between">
-              <span class="text-[11px] uppercase tracking-[0.2em] ed-text-muted font-medium">Équilibre du coffre</span>
-              <button onclick="toggleHideBalances()" class="text-xs ed-text-secondary hover:ed-text-primary">
-                ${state.hideBalances ? 'Dévoiler' : 'Voiler'}
-              </button>
-            </div>
-
-            <div class="relative z-10 grid grid-cols-2 gap-4">
-              <div>
-                <p class="text-[11px] ed-text-secondary">Souffle disponible</p>
-                <p class="font-serif text-xl font-medium ${freeReserve < 0 ? 'ed-negative' : 'ed-text-primary'} mt-0.5">
-                  ${formatCurrency(freeReserve, false, true)}
-                </p>
-              </div>
-              <div class="text-right">
-                <p class="text-[11px] ed-text-secondary">Enveloppe projets</p>
-                <p class="font-serif text-xl font-medium ed-warm-accent mt-0.5">
-                  ${formatCurrency(totalAllocated, false, true)}
-                </p>
-              </div>
-            </div>
-
-            <div class="relative z-10 space-y-1.5">
-              <div class="w-full h-2 rounded-full overflow-hidden flex" style="background-color: var(--bg-surface-alt);">
-                <div style="width: ${allocRatio}%; background-color: var(--warm-accent);" class="h-full transition-all duration-500"></div>
-              </div>
-              <p class="text-[11px] ed-text-muted text-right">${allocRatio}% de votre coffre veille sur vos envies</p>
-            </div>
-          </section>
-
-          <!-- Liste façon magazine -->
-          <section class="space-y-3.5">
-            <div class="flex items-center justify-between">
-              <p class="text-[11px] uppercase tracking-[0.2em] ed-text-secondary font-medium">Envies & caps</p>
-              <button onclick="openGoalModal()" class="text-xs ed-warm-accent font-medium">+ Glisser un cap</button>
-            </div>
-
-            ${goals.length === 0 ? emptyGoalsBlock : `
-              <div class="divide-y ed-border rounded-3xl ed-surface border overflow-hidden">
-                ${goals.map(g => {
-                  const pct = Math.min(100, Math.round((g.savedAmount / (g.targetAmount || 1)) * 100));
-                  return `
-                    <div class="p-4 space-y-2.5">
-                      <div class="flex items-baseline justify-between gap-2">
-                        <div onclick="openGoalModal('${g.id}')" class="cursor-pointer min-w-0">
-                          <p class="font-serif text-lg ed-text-primary truncate">${escapeHTML(g.title)}</p>
-                          <p class="text-[11px] ed-text-muted">${formatCurrency(g.savedAmount, false, true)} sur ${formatCurrency(g.targetAmount, false, true)}</p>
-                        </div>
-                        <div class="flex items-center gap-2 shrink-0">
-                          <span class="text-xs font-medium ed-warm-accent">${pct}%</span>
-                          <button onclick="quickAddGoalFunds('${g.id}', 50)" class="w-7 h-7 rounded-full ed-surface-alt border ed-border flex items-center justify-center text-xs ed-positive font-semibold" title="Ajouter 50 €">+</button>
-                        </div>
-                      </div>
-                      <div class="w-full h-1 rounded-full overflow-hidden" style="background-color: var(--bg-surface-alt);">
-                        <div style="width: ${pct}%; background-color: var(--warm-accent);" class="h-full rounded-full"></div>
-                      </div>
-                    </div>
-                  `;
-                }).join('')}
-              </div>
-            `}
-          </section>
-        </div>
-      `;
-    }
-
-    function renderFinanceView() {
-      const month = state.selectedMonth;
-      const { txs, income, expense, openingBalance, balance } = getMonthMetrics(month);
-      const weather = getWeatherInfo(income, expense);
-      const sparkline = buildBalanceSparklineSVG(txs, openingBalance, balance);
-
-      const eyeIcon = state.hideBalances
-        ? '<path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />'
-        : '<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />';
-
-      const visibleTxs = state.financeFilter === 'all'
-        ? txs
-        : txs.filter(t => t.type === state.financeFilter);
-
-      return `
-        <div class="space-y-6 animate-fade-in">
-          <!-- En-tête éditorial : Sélecteur de mois & Météo financière -->
-          <div class="flex items-start justify-between gap-2">
-            <div>
-              <p class="text-[11px] uppercase tracking-[0.22em] ed-warm-accent font-semibold">Météo financière</p>
-              <div class="flex items-center gap-2 mt-1">
-                <svg style="color: ${weather.color};" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
-                  ${weather.icon}
-                </svg>
-                <span class="font-serif text-lg font-medium ed-text-primary">${weather.status}</span>
-              </div>
-            </div>
-
-            <!-- Sélecteur de mois -->
-            <div class="flex items-center gap-1 ed-surface rounded-full border ed-border px-2 py-1 shrink-0">
-              <button onclick="changeMonth(-1)" aria-label="Mois précédent" class="p-1.5 rounded-full ed-surface-interactive ed-text-secondary hover:ed-text-primary">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
-              </button>
-              <span class="text-xs font-medium ed-text-primary px-1.5 text-center">${formatMonthLabel(month)}</span>
-              <button onclick="changeMonth(1)" aria-label="Mois suivant" class="p-1.5 rounded-full ed-surface-interactive ed-text-secondary hover:ed-text-primary">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
-              </button>
-            </div>
-          </div>
-
-          <!-- Carte Solde + Ligne d'Horizon -->
-          <section class="relative overflow-hidden p-5 rounded-3xl ed-surface border ed-border space-y-5">
-            <!-- Onde organique feutrée signature -->
-            <div class="pointer-events-none absolute -top-10 -right-10 w-56 h-56 opacity-45">
-              <svg viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-                <defs>
-                  <linearGradient id="cardWaveFinance" x1="20" y1="0" x2="220" y2="210" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stop-color="#F2B8A2" stop-opacity="0.30" />
-                    <stop offset="60%" stop-color="#D97B66" stop-opacity="0.15" />
-                    <stop offset="100%" stop-color="#8B4A58" stop-opacity="0" />
-                  </linearGradient>
-                </defs>
-                <path d="M55,-15 C100,38 148,30 185,72 C222,114 205,178 250,205 L250,-15 Z" fill="url(#cardWaveFinance)" />
-                <path d="M100,-10 C135,45 168,55 192,102 C216,149 190,196 245,225 L245,-10 Z" fill="url(#cardWaveFinance)" opacity="0.6" />
-              </svg>
-            </div>
-            <div style="background: radial-gradient(circle, rgba(226,142,118,0.14) 0%, transparent 70%);" class="pointer-events-none absolute -top-14 -right-14 w-44 h-44 rounded-full animate-halo"></div>
-
-            <div class="relative z-10 flex items-start justify-between">
-              <div>
-                <p class="text-[11px] uppercase tracking-[0.22em] ed-text-muted font-medium">Équilibre accumulé</p>
-                <p class="font-serif text-3xl font-medium ${balance < 0 ? 'ed-negative' : 'ed-text-primary'} tracking-tight mt-1">
-                  ${formatCurrency(balance, false, true)}
-                </p>
-              </div>
-              <button onclick="toggleHideBalances()" aria-label="Voiler ou dévoiler le solde" class="w-9 h-9 rounded-full ed-surface-alt border ed-border flex items-center justify-center ed-text-secondary hover:ed-text-primary transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
-                  ${eyeIcon}
-                </svg>
-              </button>
-            </div>
-
-            <!-- Ligne d'Horizon SVG -->
-            <div class="relative z-10 pt-1">
-              <div class="flex items-center justify-between text-[11px] ed-text-muted mb-2">
-                <span class="uppercase tracking-[0.18em]">Ligne d'horizon</span>
-                <span>${txs.length} mouvement${txs.length > 1 ? 's' : ''}</span>
-              </div>
-              <div class="w-full h-14">
-                ${sparkline}
-              </div>
-            </div>
-
-            <!-- Revenus & Dépenses du mois -->
-            <div class="relative z-10 pt-3 border-t ed-border grid grid-cols-2 gap-4">
-              <div>
-                <span class="text-[11px] ed-text-secondary">Entrées du mois</span>
-                <p class="text-sm font-medium ed-positive mt-0.5">${formatCurrency(income, true, true)}</p>
-              </div>
-              <div class="text-right">
-                <span class="text-[11px] ed-text-secondary">Sorties du mois</span>
-                <p class="text-sm font-medium ed-negative mt-0.5">${formatCurrency(-expense, true, true)}</p>
-              </div>
-            </div>
-          </section>
-
-          <!-- Ajout rapide avec boutons teintés − et + -->
-          <section class="space-y-3">
-            <p class="text-[11px] uppercase tracking-[0.2em] ed-text-secondary font-medium">Geste rapide</p>
-            <div class="grid grid-cols-2 gap-3">
-              <button
-                onclick="openTransactionModal(null, 'expense')"
-                aria-label="Noter une sortie"
-                style="background-color: rgba(252, 165, 165, 0.08); border-color: rgba(252, 165, 165, 0.28);"
-                class="p-4 rounded-2xl border flex items-center justify-center active:scale-[0.98] transition-all hover:opacity-90"
-              >
-                <span class="text-2xl font-medium ed-negative leading-none">−</span>
-              </button>
-
-              <button
-                onclick="openTransactionModal(null, 'income')"
-                aria-label="Noter une entrée"
-                style="background-color: rgba(110, 231, 183, 0.08); border-color: rgba(110, 231, 183, 0.28);"
-                class="p-4 rounded-2xl border flex items-center justify-center active:scale-[0.98] transition-all hover:opacity-90"
-              >
-                <span class="text-2xl font-medium ed-positive leading-none">+</span>
-              </button>
-            </div>
-          </section>
-
-          <!-- Opérations du mois avec filtres -->
-          <section class="space-y-3">
-            <div class="flex items-center justify-between">
-              <p class="text-[11px] uppercase tracking-[0.2em] ed-text-secondary font-medium">Mouvements du mois</p>
-              <div class="flex items-center gap-1">
-                ${[
-                  { id: 'all', label: 'Tout' },
-                  { id: 'expense', label: '−' },
-                  { id: 'income', label: '+' }
-                ].map(f => `
-                  <button
-                    onclick="setFinanceFilter('${f.id}')"
-                    class="px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors ${state.financeFilter === f.id ? 'ed-btn-primary' : 'ed-surface border ed-border ed-text-secondary'}"
-                  >
-                    ${f.label}
-                  </button>
-                `).join('')}
-              </div>
-            </div>
-
-            ${visibleTxs.length === 0 ? `
-              <div class="p-6 rounded-3xl ed-surface border ed-border text-center">
-                <p class="text-xs ed-text-muted">Aucun mouvement sur ce mois pour l’instant.</p>
-              </div>
-            ` : `
-              <div class="space-y-2">
-                ${visibleTxs.map(t => renderTransactionRow(t)).join('')}
-              </div>
-            `}
-          </section>
-        </div>
-      `;
-    }
-
-    function buildBalanceSparklineSVG(txs, openingBalance = 0, closingBalance = 0) {
-      if (state.hideBalances) {
-        return `
-          <svg viewBox="0 0 300 50" class="w-full h-full overflow-visible">
-            <line x1="0" y1="25" x2="300" y2="25" stroke="var(--border-strong)" stroke-width="1.5" stroke-dasharray="4 4" />
-          </svg>
-        `;
-      }
-
-      if (!txs || txs.length === 0) {
-        return `
-          <svg viewBox="0 0 300 50" class="w-full h-full overflow-visible">
-            <line x1="0" y1="28" x2="300" y2="28" stroke="var(--warm-accent)" stroke-width="1.6" stroke-opacity="0.55" />
-            <circle cx="300" cy="28" r="3" fill="var(--warm-accent)" />
-          </svg>
-        `;
-      }
-
-      const chronological = [...txs].sort((a, b) => a.date.localeCompare(b.date));
-      let running = openingBalance;
-      const points = [openingBalance];
-      chronological.forEach(t => {
-        running += t.type === 'income' ? Number(t.amount) : -Number(t.amount);
-        points.push(running);
-      });
-
-      const minVal = Math.min(...points);
-      const maxVal = Math.max(...points);
-      const span = maxVal - minVal || 1;
-      const width = 300;
-      const height = 46;
-      const padY = 6;
-
-      const coords = points.map((val, idx) => {
-        const x = (idx / (points.length - 1)) * width;
-        const y = height - padY - ((val - minVal) / span) * (height - padY * 2);
-        return [x, y];
-      });
-
-      const pathD = coords.map((pt, idx) => `${idx === 0 ? 'M' : 'L'} ${pt[0].toFixed(1)} ${pt[1].toFixed(1)}`).join(' ');
-      const areaD = `${pathD} L ${width} ${height} L 0 ${height} Z`;
-      const lastPt = coords[coords.length - 1];
-
-      return `
-        <svg viewBox="0 0 300 46" class="w-full h-full overflow-visible">
-          <defs>
-            <linearGradient id="horizonFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#E28E76" stop-opacity="0.25" />
-              <stop offset="100%" stop-color="#E28E76" stop-opacity="0" />
-            </linearGradient>
-          </defs>
-          <path d="${areaD}" fill="url(#horizonFill)" />
-          <path d="${pathD}" fill="none" stroke="var(--warm-accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-          <circle cx="${lastPt[0].toFixed(1)}" cy="${lastPt[1].toFixed(1)}" r="3.2" fill="var(--warm-accent)" />
-        </svg>
-      `;
-    }
-
-    function renderTransactionRow(t) {
-      const cat = CATEGORIES[t.category] || CATEGORIES['Autre'];
-      const isIncome = t.type === 'income';
-      return `
-        <div onclick="openTransactionModal('${t.id}')" class="p-3.5 rounded-2xl ed-surface border ed-border ed-surface-interactive flex items-center justify-between gap-3 cursor-pointer active:scale-[0.99] transition-all">
-          <div class="flex items-center gap-3 min-w-0">
-            <div style="background-color: ${cat.color}20; color: ${cat.color};" class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-                ${CATEGORY_SVG[cat.icon] || CATEGORY_SVG.tag}
-              </svg>
-            </div>
-            <div class="min-w-0">
-              <p class="text-sm font-medium ed-text-primary truncate">${escapeHTML(t.label)}</p>
-              <p class="text-[11px] ed-text-muted">${escapeHTML(t.category)} · ${formatShortDate(t.date)}</p>
-            </div>
-          </div>
-          <span class="text-sm font-medium shrink-0 ${isIncome ? 'ed-positive' : 'ed-negative'}">
-            ${formatCurrency(isIncome ? t.amount : -t.amount, true, true)}
-          </span>
-        </div>
-      `;
-    }
-
-    function renderMoreView() {
-      return `
-        <div class="space-y-6 animate-fade-in">
-          <!-- Profil & Accueil -->
-          <section class="p-5 rounded-3xl ed-surface border ed-border space-y-4">
-            <p class="text-[11px] uppercase tracking-[0.22em] ed-warm-accent font-semibold">Personnalisation</p>
-
-            <div>
-              <label class="text-xs ed-text-secondary block mb-1.5">Votre prénom (affiché à l'accueil)</label>
-              <div class="flex gap-2">
-                <input
-                  type="text"
-                  id="settings-username"
-                  value="${escapeHTML(state.userName || '')}"
-                  placeholder="Ex: Camille"
-                  class="flex-1 text-sm px-3.5 py-2.5 rounded-xl ed-input border"
-                />
-                <button onclick="saveUserNameFromSettings()" class="ed-btn-primary text-xs font-medium px-4 py-2.5 rounded-xl active:scale-95 transition-transform">
-                  OK
-                </button>
-              </div>
-            </div>
-
-            <div class="pt-2 border-t ed-border flex items-center justify-between">
-              <div>
-                <p class="text-sm font-medium ed-text-primary">Écran d'accueil à l'ouverture</p>
-                <p class="text-[11px] ed-text-muted">Afficher la salutation au lancement</p>
-              </div>
-              <input
-                type="checkbox"
-                ${state.showWelcomeOnOpen ? 'checked' : ''}
-                onchange="toggleSetting('showWelcomeOnOpen', this.checked)"
-                class="w-4 h-4 accent-[#E28E76]"
-              />
-            </div>
-
-            <div class="pt-2 border-t ed-border flex items-center justify-between">
-              <div>
-                <p class="text-sm font-medium ed-text-primary">Sons discrets</p>
-                <p class="text-[11px] ed-text-muted">Petit arpège feutré lors des ajouts</p>
-              </div>
-              <div class="flex items-center gap-3">
-                <button type="button" onclick="playSoftChime('save')" class="text-[11px] px-2.5 py-1 rounded-lg ed-surface-alt border ed-border ed-warm-accent hover:opacity-80">
-                  Écouter
-                </button>
-                <input
-                  type="checkbox"
-                  ${state.soundEffects ? 'checked' : ''}
-                  onchange="toggleSetting('soundEffects', this.checked)"
-                  class="w-4 h-4 accent-[#E28E76]"
-                />
-              </div>
-            </div>
-
-            <div class="pt-2 border-t ed-border">
-              <button onclick="showWelcomeScreen()" class="w-full py-2.5 rounded-xl ed-surface-alt border ed-border text-xs font-medium ed-text-secondary hover:ed-text-primary">
-                Revoir l'écran de bienvenue
-              </button>
-            </div>
-          </section>
-
-          <!-- Sauvegarde & Données -->
-          <section class="p-5 rounded-3xl ed-surface border ed-border space-y-3">
-            <p class="text-[11px] uppercase tracking-[0.22em] ed-warm-accent font-semibold">Sauvegarde & données</p>
-            <p class="text-xs ed-text-secondary leading-relaxed">
-              Vos données sont stockées localement sur votre appareil. Exportez une sauvegarde JSON avant de changer de téléphone.
-            </p>
-            <div class="grid grid-cols-2 gap-2.5 pt-1">
-              <button onclick="exportJSON()" class="py-2.5 px-3 rounded-xl ed-surface-alt border ed-border text-xs font-medium ed-text-primary hover:opacity-90">
-                Exporter JSON
-              </button>
-              <label class="py-2.5 px-3 rounded-xl ed-surface-alt border ed-border text-xs font-medium ed-text-primary text-center cursor-pointer hover:opacity-90">
-                Importer JSON
-                <input type="file" accept=".json" onchange="importJSON(event)" class="hidden" />
-              </label>
-            </div>
-          </section>
-        </div>
-      `;
-    }
-
-    function saveUserNameFromSettings() {
-      const input = document.getElementById('settings-username');
-      if (!input) return;
-      state.userName = input.value.trim();
-      saveState();
-      syncWelcomeGreeting();
-      showToast('Prénom enregistré');
-    }
-
-    function toggleSetting(key, val) {
-      state[key] = val;
-      saveState();
-      showToast('Préférence mise à jour');
-    }
-
-    // =========================================================================
-    // 7. MODALE GÉNÉRIQUE
-    // =========================================================================
-    function openModal(innerHTML) {
-      const backdrop = document.getElementById('modal-backdrop');
-      const panel = document.getElementById('modal-panel');
-      if (!backdrop || !panel) return;
-      panel.innerHTML = innerHTML;
-      backdrop.classList.remove('hidden');
-    }
-
-    function closeModal() {
-      const backdrop = document.getElementById('modal-backdrop');
-      if (backdrop) backdrop.classList.add('hidden');
-    }
-
-    function closeModalOnBackdrop(e) {
-      if (e.target && e.target.id === 'modal-backdrop') {
-        closeModal();
-      }
-    }
-
-    // =========================================================================
-    // 8. MODALE D'AJOUT / ÉDITION D'OPÉRATION FINANCIÈRE
-    // =========================================================================
-    function getDefaultDateForModal() {
-      const today = new Date();
-      const todayISO = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-      if (state.activeTab === 'finance' && state.selectedMonth && !todayISO.startsWith(state.selectedMonth)) {
-        return `${state.selectedMonth}-01`;
-      }
-      return todayISO;
-    }
-
-    function openTransactionModal(editId = null, defaultType = 'expense') {
-      const existing = editId ? state.transactions.find(t => t.id === editId) : null;
-      const type = existing ? existing.type : defaultType;
-      const amount = existing ? existing.amount : '';
-      const label = existing ? existing.label : '';
-      const category = existing ? existing.category : (type === 'income' ? 'Salaire' : 'Courses');
-      const date = existing ? existing.date : getDefaultDateForModal();
-
-      openModal(`
-        <div class="space-y-4">
-          <div class="flex items-center justify-between">
-            <h3 class="font-serif text-xl font-medium ed-text-primary">
-              ${existing ? 'Ajuster le mouvement' : 'Nouveau mouvement'}
-            </h3>
-            <button onclick="closeModal()" class="w-8 h-8 rounded-full ed-surface border ed-border flex items-center justify-center ed-text-secondary hover:ed-text-primary text-xs">✕</button>
-          </div>
-
-          <form onsubmit="submitTransaction(event, '${editId || ''}')" class="space-y-3.5">
-            <input type="hidden" name="type" id="tx-type-input" value="${type}" />
-
-            <!-- Boutons épurés − et + teintés -->
-            <div class="grid grid-cols-2 gap-2.5">
-              <button
-                type="button"
-                id="btn-type-expense"
-                onclick="selectTxType('expense')"
-                style="background-color: rgba(252, 165, 165, ${type === 'expense' ? '0.18' : '0.06'}); border-color: ${type === 'expense' ? 'var(--negative)' : 'rgba(252, 165, 165, 0.25)'};"
-                class="py-3 rounded-2xl border flex items-center justify-center transition-all"
-              >
-                <span class="text-xl font-medium ed-negative leading-none">−</span>
-              </button>
-              <button
-                type="button"
-                id="btn-type-income"
-                onclick="selectTxType('income')"
-                style="background-color: rgba(110, 231, 183, ${type === 'income' ? '0.18' : '0.06'}); border-color: ${type === 'income' ? 'var(--positive)' : 'rgba(110, 231, 183, 0.25)'};"
-                class="py-3 rounded-2xl border flex items-center justify-center transition-all"
-              >
-                <span class="text-xl font-medium ed-positive leading-none">+</span>
-              </button>
-            </div>
-
-            <div>
-              <label class="text-[11px] ed-text-secondary block mb-1">Montant (€)</label>
-              <input
-                type="number"
-                step="0.01"
-                min="0.01"
-                name="amount"
-                value="${amount}"
-                required
-                placeholder="0,00"
-                class="w-full text-lg font-serif px-3.5 py-2.5 rounded-xl ed-input border"
-              />
-            </div>
-
-            <div>
-              <label class="text-[11px] ed-text-secondary block mb-1">Libellé</label>
-              <input
-                type="text"
-                name="label"
-                value="${escapeHTML(label)}"
-                required
-                placeholder="Ex: Marché, Salaire, Loyer..."
-                class="w-full text-sm px-3.5 py-2.5 rounded-xl ed-input border"
-              />
-            </div>
-
-            <div class="grid grid-cols-2 gap-2.5">
-              <div>
-                <label class="text-[11px] ed-text-secondary block mb-1">Catégorie</label>
-                <select name="category" id="tx-category-select" class="w-full text-sm px-3.5 py-2.5 rounded-xl ed-input border">
-                  ${Object.keys(CATEGORIES).map(cat => `
-                    <option value="${cat}" ${category === cat ? 'selected' : ''}>${cat}</option>
-                  `).join('')}
-                </select>
-              </div>
-              <div>
-                <label class="text-[11px] ed-text-secondary block mb-1">Date</label>
-                <input
-                  type="date"
-                  name="date"
-                  value="${date}"
-                  required
-                  class="w-full text-sm px-3.5 py-2.5 rounded-xl ed-input border"
-                />
-              </div>
-            </div>
-
-            <div class="flex gap-2.5 pt-2">
-              ${existing ? `
-                <button
-                  type="button"
-                  onclick="deleteTransaction('${existing.id}'); closeModal();"
-                  class="px-4 py-3 rounded-xl border ed-border ed-surface ed-negative text-xs font-medium"
-                >
-                  Supprimer
-                </button>
-              ` : ''}
-              <button type="submit" class="flex-1 ed-btn-primary text-sm font-medium py-3 rounded-xl active:scale-[0.99] transition-transform">
-                ${existing ? 'Mettre à jour' : 'Enregistrer'}
-              </button>
-            </div>
-          </form>
-        </div>
-      `);
-    }
-
-    function selectTxType(newType) {
-      const hidden = document.getElementById('tx-type-input');
-      const btnExp = document.getElementById('btn-type-expense');
-      const btnInc = document.getElementById('btn-type-income');
-      const catSel = document.getElementById('tx-category-select');
-      if (hidden) hidden.value = newType;
-      if (btnExp) {
-        btnExp.style.backgroundColor = newType === 'expense' ? 'rgba(252, 165, 165, 0.18)' : 'rgba(252, 165, 165, 0.06)';
-        btnExp.style.borderColor = newType === 'expense' ? 'var(--negative)' : 'rgba(252, 165, 165, 0.25)';
-      }
-      if (btnInc) {
-        btnInc.style.backgroundColor = newType === 'income' ? 'rgba(110, 231, 183, 0.18)' : 'rgba(110, 231, 183, 0.06)';
-        btnInc.style.borderColor = newType === 'income' ? 'var(--positive)' : 'rgba(110, 231, 183, 0.25)';
-      }
-      if (catSel) {
-        catSel.value = newType === 'income' ? 'Salaire' : 'Courses';
-      }
-    }
-
-    function submitTransaction(e, editId) {
-      e.preventDefault();
-      const fd = new FormData(e.target);
-      const txDate = fd.get('date');
-      const txObj = {
-        id: editId || ('tx_' + Date.now()),
-        type: fd.get('type'),
-        amount: parseFloat(fd.get('amount')),
-        label: fd.get('label').trim(),
-        category: fd.get('category'),
-        date: txDate
-      };
-
-      if (editId) {
-        const idx = state.transactions.findIndex(t => t.id === editId);
-        if (idx !== -1) state.transactions[idx] = txObj;
-      } else {
-        state.transactions.unshift(txObj);
-      }
-
-      if (txDate && txDate.length >= 7) {
-        state.selectedMonth = txDate.slice(0, 7);
-      }
-
-      saveState();
-      playSoftChime('save');
-      closeModal();
-      renderActiveView();
-      showToast(editId ? 'Opération modifiée' : 'Opération ajoutée');
-    }
-
-    function deleteTransaction(id) {
-      state.transactions = state.transactions.filter(t => t.id !== id);
-      saveState();
-      renderActiveView();
-      showToast('Opération supprimée');
-    }
-
-    // =========================================================================
-    // 8B. MODALE DE CRÉATION / ÉDITION D'UN PROJET OU VOYAGE
-    // =========================================================================
-    function openGoalModal(editId = null) {
-      const existing = editId ? state.goals.find(g => g.id === editId) : null;
-      const title = existing ? existing.title : '';
-      const category = existing ? (existing.category || 'Voyage') : 'Voyage';
-      const targetAmount = existing ? existing.targetAmount : '';
-      const savedAmount = existing ? existing.savedAmount : 0;
-      const deadline = existing ? (existing.deadline || '') : '';
-      const priority = existing ? Boolean(existing.priority) : (state.goals.length === 0);
-
-      openModal(`
-        <div class="space-y-4">
-          <div class="flex items-center justify-between">
-            <h3 class="font-serif text-xl font-medium ed-text-primary">
-              ${existing ? 'Ajuster le projet' : 'Nouveau projet ou escapade'}
-            </h3>
-            <button onclick="closeModal()" class="w-8 h-8 rounded-full ed-surface border ed-border flex items-center justify-center ed-text-secondary hover:ed-text-primary text-xs">✕</button>
-          </div>
-
-          <form onsubmit="submitGoal(event, '${editId || ''}')" class="space-y-3.5">
-            <div>
-              <label class="text-[11px] ed-text-secondary block mb-1">Nom du projet ou de la destination</label>
-              <input
-                type="text"
-                name="title"
-                value="${escapeHTML(title)}"
-                required
-                placeholder="Ex: Escapade à Kyoto, Fonds de sécurité..."
-                class="w-full text-sm px-3.5 py-2.5 rounded-xl ed-input border"
-              />
-            </div>
-
-            <div class="grid grid-cols-2 gap-2.5">
-              <div>
-                <label class="text-[11px] ed-text-secondary block mb-1">Objectif (€)</label>
-                <input
-                  type="number"
-                  step="1"
-                  min="1"
-                  name="targetAmount"
-                  value="${targetAmount}"
-                  required
-                  placeholder="2000"
-                  class="w-full text-sm px-3.5 py-2.5 rounded-xl ed-input border"
-                />
-              </div>
-              <div>
-                <label class="text-[11px] ed-text-secondary block mb-1">Déjà mis de côté (€)</label>
-                <input
-                  type="number"
-                  step="1"
-                  min="0"
-                  name="savedAmount"
-                  value="${savedAmount}"
-                  required
-                  class="w-full text-sm px-3.5 py-2.5 rounded-xl ed-input border"
-                />
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2.5">
-              <div>
-                <label class="text-[11px] ed-text-secondary block mb-1">Thème</label>
-                <select name="category" class="w-full text-sm px-3.5 py-2.5 rounded-xl ed-input border">
-                  ${['Voyage', 'Évasion', 'Sécurité', 'Projet', 'Cadeau'].map(cat => `
-                    <option value="${cat}" ${category === cat ? 'selected' : ''}>${cat}</option>
-                  `).join('')}
-                </select>
-              </div>
-              <div>
-                <label class="text-[11px] ed-text-secondary block mb-1">Échéance (optionnel)</label>
-                <input
-                  type="date"
-                  name="deadline"
-                  value="${deadline}"
-                  class="w-full text-sm px-3.5 py-2.5 rounded-xl ed-input border"
-                />
-              </div>
-            </div>
-
-            <label class="flex items-center gap-2.5 pt-1 cursor-pointer">
-              <input type="checkbox" name="priority" ${priority ? 'checked' : ''} class="rounded" />
-              <span class="text-xs ed-text-secondary">Définir comme cap prioritaire (mis en avant)</span>
-            </label>
-
-            <div class="flex gap-2.5 pt-2">
-              ${existing ? `
-                <button
-                  type="button"
-                  onclick="deleteGoal('${existing.id}'); closeModal();"
-                  class="px-4 py-3 rounded-xl border ed-border ed-surface ed-negative text-xs font-medium"
-                >
-                  Supprimer
-                </button>
-              ` : ''}
-              <button type="submit" class="flex-1 ed-btn-primary text-sm font-medium py-3 rounded-xl active:scale-[0.99] transition-transform">
-                ${existing ? 'Mettre à jour' : 'Créer le projet'}
-              </button>
-            </div>
-          </form>
-        </div>
-      `);
-    }
-
-    function submitGoal(e, editId) {
-      e.preventDefault();
-      const fd = new FormData(e.target);
-      const isPriority = fd.get('priority') === 'on';
-
-      if (isPriority) {
-        state.goals.forEach(g => { g.priority = false; });
-      }
-
-      if (editId) {
-        const idx = state.goals.findIndex(g => g.id === editId);
-        if (idx !== -1) {
-          state.goals[idx] = {
-            ...state.goals[idx],
-            title: fd.get('title').trim(),
-            category: fd.get('category'),
-            targetAmount: parseFloat(fd.get('targetAmount')),
-            savedAmount: parseFloat(fd.get('savedAmount')) || 0,
-            deadline: fd.get('deadline') || '',
-            priority: isPriority
-          };
-        }
-      } else {
-        state.goals.unshift({
-          id: 'goal_' + Date.now(),
-          title: fd.get('title').trim(),
-          category: fd.get('category'),
-          targetAmount: parseFloat(fd.get('targetAmount')),
-          savedAmount: parseFloat(fd.get('savedAmount')) || 0,
-          deadline: fd.get('deadline') || '',
-          priority: isPriority,
-          activeTab: 'budget',
-          notes: '',
-          checklist: []
-        });
-      }
-
-      saveState();
-      playSoftChime('save');
-      closeModal();
-      renderActiveView();
-      showToast(editId ? 'Projet mis à jour' : 'Nouveau projet créé');
-    }
-
-    function deleteGoal(id) {
-      state.goals = state.goals.filter(g => g.id !== id);
-      saveState();
-      renderActiveView();
-      showToast('Projet supprimé');
-    }
-
-    // =========================================================================
-    // 9. EXPORT / IMPORT JSON
-    // =========================================================================
-    function exportJSON() {
-      const dataStr = JSON.stringify(state, null, 2);
-      const blob = new Blob([dataStr], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `coffre-doux-${new Date().toISOString().slice(0, 10)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('Sauvegarde exportée');
-    }
-
-    function importJSON(e) {
-      const file = e.target.files && e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const imported = JSON.parse(reader.result);
-          state = {
-            ...createCleanData(),
-            ...imported,
-            transactions: Array.isArray(imported.transactions) ? imported.transactions : [],
-            goals: Array.isArray(imported.goals) ? imported.goals : []
-          };
-          if (state.transactions.length > 0 && state.transactions[0].date) {
-            state.selectedMonth = state.transactions[0].date.slice(0, 7);
-          }
-          saveState();
-          updateNavUI();
-          renderActiveView();
-          showToast('Données importées');
-        } catch (err) {
-          showToast('Fichier JSON invalide');
-        }
-      };
-      reader.readAsText(file);
-    }
-
-    // =========================================================================
-    // 10. INITIALISATION DE L'APPLICATION
-    // =========================================================================
-    window.addEventListener('DOMContentLoaded', () => {
-      updateNavUI();
-      renderActiveView();
-      if (state.showWelcomeOnOpen) {
-        showWelcomeScreen();
-      }
-    });
+    render();
   </script>
 </body>
 </html>
