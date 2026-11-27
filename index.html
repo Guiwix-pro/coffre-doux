@@ -32,17 +32,17 @@
       --negative: #E08279;
       --negative-bg: rgba(224, 130, 121, 0.11);
       --border: rgba(245, 239, 234, 0.08);
-      --border-strong: rgba(245, 239, 234, 0.14);
-    }
+    --border-strong: rgba(245, 239, 234, 0.14);
+  }
 
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-    }
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
 
-    *::-webkit-scrollbar {
+  *::-webkit-scrollbar {
       display: none;
       width: 0;
       height: 0;
@@ -88,6 +88,23 @@
       animation: haloBreath 6.5s ease-in-out infinite;
     }
 
+    @keyframes horizonGentleReveal {
+      0% {
+        stroke-dashoffset: var(--horizon-len, 360);
+        opacity: 0.25;
+      }
+      100% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+      }
+    }
+
+    .horizon-line-once {
+      stroke-dasharray: var(--horizon-len, 360);
+      stroke-dashoffset: 0;
+      animation: horizonGentleReveal 2.2s cubic-bezier(0.22, 1, 0.36, 1) 1 forwards;
+    }
+
     .app-shell {
       width: 100%;
       max-width: 412px;
@@ -102,8 +119,12 @@
 
     @media (min-width: 500px) {
       .app-shell {
+        width: 412px;
+        min-width: 412px;
         height: 820px;
+        min-height: 820px;
         max-height: 92vh;
+        flex: 0 0 auto;
         border-radius: 38px;
         border: 1px solid var(--border-strong);
         box-shadow: 0 28px 70px rgba(0, 0, 0, 0.72), 0 0 0 1px rgba(245, 239, 234, 0.04);
@@ -115,9 +136,9 @@
       position: sticky;
       top: 0;
       z-index: 20;
-      display: flex;
+      display: grid;
+      grid-template-columns: 40px 1fr 40px;
       align-items: center;
-      justify-content: space-between;
       padding: 18px 20px 14px;
       background: rgba(20, 18, 17, 0.88);
       backdrop-filter: blur(14px);
@@ -130,6 +151,7 @@
       justify-content: center;
       width: 40px;
       height: 40px;
+      padding: 0;
       border-radius: 12px;
       background: var(--bg-card);
       border: 1px solid var(--border-strong);
@@ -148,14 +170,46 @@
       font-weight: 500;
       letter-spacing: -0.01em;
       margin: 0;
+      text-align: center;
+    }
+
+    .brand-logo-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      color: var(--accent);
+      cursor: pointer;
+      transition: transform 0.18s ease, border-color 0.18s ease;
+    }
+
+    .brand-logo-btn:active {
+      transform: scale(0.95);
+    }
+
+    .header-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.2rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      margin: 0;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .icon-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       border-radius: 10px;
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -172,7 +226,7 @@
     #main-content {
       flex: 1;
       overflow-y: auto;
-      padding: 20px 20px 104px;
+      padding: 18px 18px 98px;
     }
 
     .ed-card {
@@ -181,7 +235,7 @@
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 22px;
-      padding: 22px;
+      padding: 18px;
     }
 
     .ed-card-soft {
@@ -190,7 +244,7 @@
       background: var(--bg-card-soft);
       border: 1px solid var(--border);
       border-radius: 18px;
-      padding: 16px;
+      padding: 14px;
     }
 
     .organic-wave {
@@ -207,10 +261,10 @@
       background: var(--text-main);
       color: var(--bg-app);
       border: none;
-      border-radius: 16px;
-      padding: 14px 18px;
+      border-radius: 14px;
+      padding: 10px 16px;
       font-weight: 600;
-      font-size: 0.88rem;
+      font-size: 0.84rem;
       letter-spacing: 0.02em;
       cursor: pointer;
       transition: transform 0.15s ease, opacity 0.15s ease;
@@ -224,18 +278,19 @@
       background: transparent;
       color: var(--text-main);
       border: 1px solid var(--border-strong);
-      border-radius: 14px;
-      padding: 11px 16px;
+      border-radius: 12px;
+      padding: 7px 12px;
       font-weight: 500;
-      font-size: 0.88rem;
+      font-size: 0.82rem;
+      line-height: 1.25;
       cursor: pointer;
     }
 
     .sign-btn {
       flex: 1;
-      height: 54px;
-      border-radius: 16px;
-      font-size: 1.5rem;
+      height: 44px;
+      border-radius: 14px;
+      font-size: 1.35rem;
       font-weight: 400;
       display: inline-flex;
       align-items: center;
@@ -350,7 +405,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 22px 22px calc(24px + env(safe-area-inset-bottom, 0px));
+      padding: 26px 22px 28px 26px;
       overflow-y: auto;
     }
 
@@ -533,7 +588,7 @@
       <span class="label-caps" id="welcome-date-label"></span>
     </div>
 
-    <div style="position:relative;z-index:2;margin:auto 0;padding:18px 0;">
+    <div id="onboarding-step" style="position:relative;z-index:2;margin:auto 0;padding:24px 0 12px 6px;">
       <p class="label-caps" style="color:var(--accent);margin-bottom:8px;" id="welcome-greeting-small">PREMIER PAS</p>
       <h1 class="font-serif-ed" style="font-size:1.85rem;line-height:1.18;font-weight:500;margin:0 0 8px;">
         Votre <span style="font-style:italic;color:var(--accent);">Coffre Doux.</span>
@@ -570,6 +625,20 @@
           </button>
         </form>
       </div>
+    </div>
+
+    <div id="returning-welcome-step" style="display:none;position:relative;z-index:2;margin:auto 0;padding:24px 0 12px 6px;">
+      <p class="label-caps" style="color:var(--accent);margin-bottom:10px;" id="returning-welcome-kicker">BONJOUR</p>
+      <h1 class="font-serif-ed" style="font-size:2rem;line-height:1.18;font-weight:500;margin:0 0 12px;">
+        Bienvenue, <span style="font-style:italic;color:var(--accent);" id="returning-welcome-name"></span>.
+      </h1>
+      <p style="color:var(--text-muted);line-height:1.6;font-size:0.9rem;margin:0 0 22px;">
+        Votre coffre est prêt. Retrouvez votre souffle, vos mouvements et vos envies à votre rythme.
+      </p>
+
+      <button type="button" class="btn-cream" style="width:100%;padding:14px 18px;" onclick="continueFromWelcome()">
+        CONTINUER →
+      </button>
     </div>
 
     <div style="position:relative;z-index:2;text-align:center;">
@@ -737,7 +806,7 @@
         selectedMonth: getCurrentMonthISO(),
         discretionMode: false,
         soundEnabled: true,
-        hapticPattern: 'double',
+        hapticPattern: 'feather',
         showWelcomeOnLaunch: true,
         transactions: [],
         goals: [],
@@ -759,6 +828,7 @@
         return {
           ...defaults,
           ...parsed,
+          hapticPattern: 'feather',
           onboardingCompleted: Boolean(parsed.onboardingCompleted || (parsed.userName && parsed.userName.trim().length > 0)),
           transactions: Array.isArray(parsed.transactions) ? parsed.transactions : [],
           goals: Array.isArray(parsed.goals) ? parsed.goals : []
@@ -771,6 +841,23 @@
     function saveState() {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {}
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+    }
+
+    function triggerHapticFeedback() {
+      if (!state.soundEnabled) return;
+      // Rythme unique "Plume" : impulsion ultra-légère de 8 ms
+      try {
+        if (navigator.vibrate) navigator.vibrate(8);
       } catch (e) {}
     }
 
@@ -968,9 +1055,11 @@
         return `${x.toFixed(1)},${y.toFixed(1)}`;
       });
 
+      const approxLen = Math.max(w * 1.25, points.length * 90).toFixed(0);
+
       return `
         <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:54px;display:block;overflow:visible;">
-          <polyline fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" points="${coords.join(' ')}" />
+          <polyline class="horizon-line-once" style="--horizon-len:${approxLen};" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" points="${coords.join(' ')}" />
         </svg>
       `;
     }
@@ -1152,7 +1241,19 @@
           <button type="button" class="btn-ghost" style="padding:6px 12px;font-size:0.78rem;" onclick="openGoalModal()">+ Nouvelle tirelire</button>
         </div>
         ${priorityCard}
-        ${othersHtml || (!topGoal ? `<div class="ed-card">${renderEmptySeal('Aucune tirelire ouverte pour le moment.')}</div>` : '')}
+        ${othersHtml || (!topGoal ? `
+          <div class="ed-card" style="text-align:center;padding:24px 18px;">
+            ${renderOrganicWaveSVG()}
+            <div class="label-caps" style="color:var(--accent);margin-bottom:8px;">NOUVELLE ENVIE</div>
+            <h3 class="font-serif-ed" style="margin:0 0 8px;font-size:1.25rem;font-weight:500;">Aucune tirelire ouverte pour le moment</h3>
+            <p style="color:var(--text-muted);font-size:0.85rem;line-height:1.5;margin:0 auto 16px;max-width:260px;">
+              Créez une tirelire pour suivre doucement un voyage, une réserve ou un projet.
+            </p>
+            <button type="button" class="btn-cream" style="padding:11px 18px;font-size:0.84rem;" onclick="openGoalModal()">
+              + Créer une tirelire
+            </button>
+          </div>
+        ` : '')}
       `;
     }
 
@@ -1298,18 +1399,12 @@
           </label>
 
           <label style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;cursor:pointer;">
-            <span style="font-size:0.9rem;">Vibration tactile douce</span>
+            <span style="font-size:0.9rem;">Vibration tactile douce · Plume</span>
             <span class="ed-switch">
               <input type="checkbox" ${state.soundEnabled ? 'checked' : ''} onchange="toggleSoundSetting(this.checked)" />
               <span class="ed-switch-track"></span>
             </span>
           </label>
-
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
-            <button type="button" class="pill-tab ${state.hapticPattern === 'feather' ? 'active' : ''}" onclick="setHapticPattern('feather')">1. Plume</button>
-            <button type="button" class="pill-tab ${state.hapticPattern === 'double' ? 'active' : ''}" onclick="setHapticPattern('double')">2. Double toc</button>
-            <button type="button" class="pill-tab ${state.hapticPattern === 'wave' ? 'active' : ''}" onclick="setHapticPattern('wave')">3. Onde posée</button>
-          </div>
 
           <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
             <button type="button" class="btn-ghost" style="padding:7px 12px;font-size:0.8rem;" onclick="reopenOnboarding()">Revoir l'écran de premier pas</button>
@@ -1402,6 +1497,12 @@
       document.getElementById('welcome-screen').classList.remove('hidden');
     }
 
+    function continueFromWelcome() {
+      document.body.classList.remove('onboarding-open');
+      document.getElementById('welcome-screen').classList.add('hidden');
+      triggerHapticFeedback();
+    }
+
     function submitOnboarding(e) {
       e.preventDefault();
       const nameVal = (document.getElementById('onboard-name').value || '').trim();
@@ -1438,6 +1539,7 @@
 
       state.onboardingCompleted = true;
       saveState();
+      syncWelcomeHeader();
       render();
       document.body.classList.remove('onboarding-open');
       document.getElementById('welcome-screen').classList.add('hidden');
@@ -1451,6 +1553,25 @@
       const small = document.getElementById('welcome-greeting-small');
       const dateEl = document.getElementById('welcome-date-label');
       const nameInput = document.getElementById('onboard-name');
+      const onboardingStep = document.getElementById('onboarding-step');
+      const returningStep = document.getElementById('returning-welcome-step');
+      const returningKicker = document.getElementById('returning-welcome-kicker');
+      const returningName = document.getElementById('returning-welcome-name');
+
+      const hasProfile = Boolean(state.onboardingCompleted && state.userName && state.userName.trim().length > 0);
+
+      if (onboardingStep && returningStep) {
+        onboardingStep.style.display = hasProfile ? 'none' : 'block';
+        returningStep.style.display = hasProfile ? 'block' : 'none';
+      }
+
+      if (returningKicker) {
+        returningKicker.textContent = `BONJOUR, ${String(state.userName || '').toUpperCase()}`;
+      }
+      if (returningName) {
+        returningName.textContent = state.userName || '';
+      }
+
       if (small) {
         small.textContent = state.userName ? `BONJOUR, ${state.userName.toUpperCase()}` : 'PREMIER PAS';
       }
