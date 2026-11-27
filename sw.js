@@ -1,5 +1,5 @@
-const CACHE_NAME = 'coffre-doux-v7';
-const ASSETS = ['./', './index.html', './manifest.json'];
+const CACHE_NAME = 'coffre-doux-v8';
+const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 // Mise en cache des ressources essentielles à l'installation
 self.addEventListener('install', (event) => {
