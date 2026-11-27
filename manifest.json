@@ -6,17 +6,17 @@
 "scope": "./",
 "display": "standalone",
 "orientation": "portrait",
-"background_color": "#0E0E10",
-"theme_color": "#0E0E10",
+"background_color": "#141211",
+"theme_color": "#141211",
 "icons": [
 {
-"src": "https://placehold.co/192x192/0E0E10/E28E76.png?text=CD",
+"src": "https://placehold.co/192x192/141211/E28E76.png?text=CD",
 "sizes": "192x192",
 "type": "image/png",
 "purpose": "any maskable"
 },
 {
-"src": "https://placehold.co/512x512/0E0E10/E28E76.png?text=CD",
+"src": "https://placehold.co/512x512/141211/E28E76.png?text=CD",
 "sizes": "512x512",
 "type": "image/png",
 "purpose": "any maskable"
