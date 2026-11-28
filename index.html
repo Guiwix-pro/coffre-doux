@@ -1013,6 +1013,7 @@
     const STORAGE_KEY = 'coffre_doux_v4_state';
     const IDB_NAME = 'coffre_doux_db';
     const IDB_STORE = 'state_backup';
+    const WEATHER_CACHE_TTL_MS = 20 * 60 * 1000;
 
     const CATEGORIES = {
       expense: ['Alimentation', 'Abonnements', 'Logement', 'Transport', 'Loisirs', 'Santé', 'Autre'],
@@ -1059,6 +1060,8 @@
         soundEnabled: true,
         showWelcomeOnLaunch: true,
         autoCarryRecurring: true,
+        liveWeatherEnabled: true,
+        weatherCache: null,
         transactions: [],
         goals: [],
         recipes: [],
@@ -1081,6 +1084,7 @@
     let toastTimer = null;
     let activeRecipeDetailId = null;
     let activeRecipeScale = 1;
+    let isWeatherRefreshing = false;
 
     function loadState() {
       try {
@@ -1270,6 +1274,221 @@
       return 'Un peu de vigilance cette période, rien d’irréversible.';
     }
 
+    function describeWeatherCode(code) {
+      const c = Number(code);
+      if (c === 0) return 'Ciel dégagé et lumière claire';
+      if (c === 1) return 'Belles éclaircies douces';
+      if (c === 2) return 'Partiellement nuageux et calme';
+      if (c === 3) return 'Ciel couvert et paisible';
+      if (c === 45 || c === 48) return 'Brume douce et atmosphère feutrée';
+      if (c >= 51 && c <= 57) return 'Fine bruine légère';
+      if (c >= 61 && c <= 67) return 'Pluie calme sur les vitres';
+      if (c >= 71 && c <= 77) return 'Flocons silencieux';
+      if (c >= 80 && c <= 82) return 'Averses passagères';
+      if (c >= 95) return 'Orage au loin, restez à l’abri';
+      return 'Temps variable et posé';
+    }
+
+    function getFallbackDayWeatherBubble() {
+      const hour = new Date().getHours();
+      const month = new Date().getMonth() + 1;
+      const isWinterOrAutumn = month >= 10 || month <= 3;
+      const moment = (hour >= 19 || hour < 6) ? 'SOIRÉE' : (hour < 12 ? 'MATIN' : 'APRÈS-MIDI');
+
+      if (hour >= 19 || hour < 6) {
+        return {
+          kicker: `MÉTÉO DU JOUR · ${moment}`,
+          headline: 'Ciel clair et lumière douce',
+          tempBadge: '',
+          detail: isWinterOrAutumn
+            ? 'Atmosphère fraîche dehors, ambiance feutrée à l’intérieur.'
+            : 'Brise calme et fin de journée paisible pour ralentir.'
+        };
+      }
+      if (hour < 12) {
+        return {
+          kicker: `MÉTÉO DU JOUR · ${moment}`,
+          headline: 'Lumière dorée et air vif',
+          tempBadge: '',
+          detail: isWinterOrAutumn
+            ? 'Matinée fraîche, idéale pour démarrer tranquillement.'
+            : 'Douce clarté matinale pour lancer la journée à votre rythme.'
+        };
+      }
+      return {
+        kicker: `MÉTÉO DU JOUR · ${moment}`,
+        headline: 'Temps calme et éclaircies',
+        tempBadge: '',
+        detail: isWinterOrAutumn
+          ? 'Clarté légère et rythme posé au cœur de la journée.'
+          : 'Belle lumière d’après-midi, calme et équilibrée.'
+      };
+    }
+
+    function getDayWeatherBubble() {
+      const fallback = getFallbackDayWeatherBubble();
+      if (!state.liveWeatherEnabled) {
+        return {
+          ...fallback,
+          locationLabel: 'Mode local',
+          tempLabel: '',
+          isLive: false
+        };
+      }
+
+      const cached = state.weatherCache;
+      if (cached && typeof cached === 'object' && cached.headline) {
+        const tempPart = typeof cached.temp === 'number' && !isNaN(cached.temp)
+          ? `${Math.round(cached.temp)}°C`
+          : '';
+        const placePart = cached.place ? cached.place : 'Position actuelle';
+        return {
+          kicker: `MÉTÉO EN DIRECT · ${placePart.toUpperCase()}`,
+          headline: cached.headline,
+          tempBadge: tempPart,
+          detail: cached.detail || fallback.detail,
+          locationLabel: placePart,
+          tempLabel: tempPart,
+          isLive: true
+        };
+      }
+
+      return {
+        ...fallback,
+        locationLabel: isWeatherRefreshing ? 'Localisation en cours…' : 'Position actuelle',
+        tempLabel: '',
+        isLive: false
+      };
+    }
+
+    function getCurrentPositionCoords(timeoutMs = 7000) {
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject(new Error('Géolocalisation indisponible'));
+          return;
+        }
+        navigator.geolocation.getCurrentPosition(
+          (pos) => resolve({
+            lat: pos.coords.latitude,
+            lon: pos.coords.longitude
+          }),
+          (err) => reject(err),
+          { enableHighAccuracy: false, timeout: timeoutMs, maximumAge: 10 * 60 * 1000 }
+        );
+      });
+    }
+
+    async function resolvePlaceName(lat, lon) {
+      try {
+        const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&zoom=10&addressdetails=1`;
+        const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+        if (!res.ok) return 'Position actuelle';
+        const data = await res.json();
+        const addr = data && data.address ? data.address : {};
+        return addr.city || addr.town || addr.village || addr.municipality || addr.county || 'Position actuelle';
+      } catch (e) {
+        return 'Position actuelle';
+      }
+    }
+
+    async function refreshLiveWeather(force = false) {
+      if (!state.liveWeatherEnabled) return;
+      if (isWeatherRefreshing) return;
+
+      const cached = state.weatherCache;
+      if (!force && cached && cached.fetchedAt && (Date.now() - cached.fetchedAt) < WEATHER_CACHE_TTL_MS) {
+        return;
+      }
+
+      isWeatherRefreshing = true;
+      try {
+        const { lat, lon } = await getCurrentPositionCoords(7500);
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lon)}&current=temperature_2m,weather_code&timezone=auto`;
+        const res = await fetch(weatherUrl);
+        if (!res.ok) throw new Error('Erreur météo');
+        const data = await res.json();
+        const current = data && data.current ? data.current : {};
+        const temp = typeof current.temperature_2m === 'number' ? current.temperature_2m : null;
+        const code = current.weather_code;
+        const headline = describeWeatherCode(code);
+        const place = await resolvePlaceName(lat, lon);
+
+        const tempText = temp !== null ? `${Math.round(temp)}°C` : '';
+        const detailText = temp !== null
+          ? `${place} · ${headline.toLowerCase()} · Température : ${tempText}.`
+          : `${place} · ${headline.toLowerCase()}.`;
+
+        state.weatherCache = {
+          lat,
+          lon,
+          place,
+          temp,
+          code,
+          headline,
+          detail: detailText,
+          fetchedAt: Date.now()
+        };
+        saveState();
+        if (state.activeTab === 'home') {
+          render();
+        }
+        if (force) {
+          showToast(`Météo actualisée (${place}${tempText ? ` · ${tempText}` : ''})`);
+        }
+      } catch (e) {
+        if (force) {
+          showToast('Météo locale affichée');
+        }
+      } finally {
+        isWeatherRefreshing = false;
+        if (force && state.activeTab === 'home') {
+          render();
+        }
+      }
+    }
+
+    function toggleLiveWeatherSetting(checked) {
+      state.liveWeatherEnabled = Boolean(checked);
+      saveState();
+      if (state.liveWeatherEnabled) {
+        refreshLiveWeather(true);
+      } else {
+        render();
+        showToast('Météo locale active');
+      }
+    }
+
+    function getPriorityFilmBubble() {
+      const items = Array.isArray(state.watchlistItems) ? state.watchlistItems : [];
+      const films = items.filter(i => i.format === 'film' && i.status !== 'watched');
+      const priorityFilm =
+        films.find(i => i.favorite && i.status === 'watching') ||
+        films.find(i => i.favorite) ||
+        films.find(i => i.status === 'watching') ||
+        films[0] ||
+        null;
+
+      if (!priorityFilm) {
+        return {
+          hasFilm: false,
+          title: 'Aucun film prioritaire',
+          meta: 'Épinglez un film dans « À voir » pour l’afficher ici.',
+          actionLabel: 'Ouvrir À voir →'
+        };
+      }
+
+      const statusText = priorityFilm.status === 'watching' ? 'En cours' : 'À voir';
+      const subParts = [statusText, priorityFilm.platform, priorityFilm.note].filter(Boolean);
+
+      return {
+        hasFilm: true,
+        id: priorityFilm.id,
+        title: priorityFilm.title,
+        meta: subParts.join(' · '),
+        actionLabel: 'Voir la liste →'
+      };
+    }
+
     function renderOrganicWaveSVG() {
       return `
         <svg class="organic-wave" viewBox="0 0 180 180" fill="none">
@@ -1400,6 +1619,12 @@
       const now = new Date();
       const dateStr = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
       const greetingName = state.userName ? `, ${state.userName}` : '';
+      const weatherBubble = getDayWeatherBubble();
+      const filmBubble = getPriorityFilmBubble();
+
+      const tempPillHtml = weatherBubble.tempBadge
+        ? `<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;background:var(--accent-soft);border:1px solid rgba(226,142,118,0.35);color:var(--accent);font-size:0.78rem;font-weight:600;flex-shrink:0;">${escapeHtml(weatherBubble.tempBadge)}</span>`
+        : '';
 
       return `
         <div style="margin-bottom:20px;">
@@ -1408,7 +1633,7 @@
           <p class="font-serif-ed" style="margin:0;font-style:italic;color:var(--text-muted);font-size:0.96rem;">${escapeHtml(getFinancialWeather(totalBalance))}</p>
         </div>
 
-        <div class="ed-card" style="margin-bottom:20px;cursor:pointer;" onclick="navigateTo('finance')">
+        <div class="ed-card" style="margin-bottom:16px;cursor:pointer;" onclick="navigateTo('finance')">
           ${renderOrganicWaveSVG()}
           <div style="width:160px;height:160px;border-radius:999px;background:radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);position:absolute;right:-35px;bottom:-45px;pointer-events:none;" class="halo-pulse"></div>
 
@@ -1427,6 +1652,37 @@
 
           <div class="font-serif-ed" style="font-size:2.35rem;font-weight:500;letter-spacing:-0.02em;color:var(--text-main);position:relative;z-index:2;">
             ${formatMoney(totalBalance)}
+          </div>
+        </div>
+
+        <div class="ed-card-soft" style="margin-bottom:14px;cursor:pointer;" onclick="navigateTo('watchlist')">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;">
+            <span class="label-caps" style="color:var(--accent);">FILM PRIORITAIRE · À VOIR</span>
+            <span style="font-size:0.74rem;color:var(--accent);font-weight:500;">${escapeHtml(filmBubble.actionLabel)}</span>
+          </div>
+          <div class="font-serif-ed" style="font-size:1.12rem;font-weight:500;color:var(--text-main);margin-bottom:4px;">
+            ${filmBubble.hasFilm ? '★ ' : ''}${escapeHtml(filmBubble.title)}
+          </div>
+          <div style="font-size:0.79rem;color:var(--text-muted);line-height:1.42;">
+            ${escapeHtml(filmBubble.meta)}
+          </div>
+        </div>
+
+        <div class="ed-card-soft" style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;">
+            <span class="label-caps">${escapeHtml(weatherBubble.kicker)}</span>
+            <button type="button" class="btn-ghost" style="padding:3px 9px;font-size:0.7rem;" onclick="refreshLiveWeather(true)">
+              ${isWeatherRefreshing ? 'Actualisation…' : 'Actualiser'}
+            </button>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:4px;">
+            <div class="font-serif-ed" style="font-style:italic;font-size:1.05rem;color:var(--text-main);">
+              ${escapeHtml(weatherBubble.headline)}
+            </div>
+            ${tempPillHtml}
+          </div>
+          <div style="font-size:0.79rem;color:var(--text-muted);line-height:1.42;">
+            ${escapeHtml(weatherBubble.detail)}
           </div>
         </div>
       `;
@@ -2477,6 +2733,17 @@
           </label>
 
           <label style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;cursor:pointer;">
+            <div>
+              <div style="font-size:0.9rem;">Météo &amp; température selon votre position</div>
+              <div style="font-size:0.74rem;color:var(--text-subtle);">S’actualise où que vous soyez via la géolocalisation</div>
+            </div>
+            <span class="ed-switch">
+              <input type="checkbox" ${state.liveWeatherEnabled ? 'checked' : ''} onchange="toggleLiveWeatherSetting(this.checked)" />
+              <span class="ed-switch-track"></span>
+            </span>
+          </label>
+
+          <label style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;cursor:pointer;">
             <span style="font-size:0.9rem;">Vibration tactile douce · Plume</span>
             <span class="ed-switch">
               <input type="checkbox" ${state.soundEnabled ? 'checked' : ''} onchange="toggleSoundSetting(this.checked)" />
@@ -2541,6 +2808,9 @@
       saveState();
       render();
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (tab === 'home' && state.liveWeatherEnabled) {
+        refreshLiveWeather(false);
+      }
     }
 
     function toggleDiscretion() {
@@ -2621,6 +2891,7 @@
       document.getElementById('welcome-screen').classList.add('hidden');
       triggerHapticFeedback();
       render();
+      refreshLiveWeather(false);
       showToast(`Bienvenue, ${state.userName}`);
     }
 
@@ -2628,6 +2899,7 @@
       document.body.classList.remove('onboarding-open');
       document.getElementById('welcome-screen').classList.add('hidden');
       triggerHapticFeedback();
+      refreshLiveWeather(false);
     }
 
     function syncWelcomeHeader() {
@@ -3014,6 +3286,9 @@
       document.getElementById('welcome-screen').classList.add('hidden');
     }
     render();
+    if (state.liveWeatherEnabled) {
+      refreshLiveWeather(false);
+    }
   </script>
 </body>
 </html>
