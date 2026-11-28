@@ -1211,6 +1211,12 @@
       return label.charAt(0).toUpperCase() + label.slice(1);
     }
 
+    function shiftMonth(delta) {
+      state.selectedMonth = shiftMonthString(state.selectedMonth, delta);
+      saveState();
+      render();
+    }
+
     function isScheduledFutureRecurring(tx) {
       if (!tx || !tx.recurring || tx.noBalanceImpact) return false;
       const txDate = String(tx.date || '');
