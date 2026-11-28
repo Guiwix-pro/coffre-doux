@@ -1,7 +1,7 @@
 {
 "name": "Coffre-Doux",
 "short_name": "Coffre-Doux",
-"description": "Un espace calme, privé et local pour suivre votre budget à votre rythme.",
+"description": "Un espace calme, privé et local pour suivre votre budget, vos recettes et vos envies à votre rythme.",
 "start_url": "./index.html",
 "scope": "./",
 "display": "standalone",
