@@ -1,4 +1,4 @@
-const CACHE_NAME = 'coffre-doux-v26';
+const CACHE_NAME = 'coffre-doux-v31';
 const ASSETS = [
   './',
   './index.html',
