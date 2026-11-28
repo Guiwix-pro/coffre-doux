@@ -1,4 +1,4 @@
-const CACHE_NAME = 'coffre-doux-v25';
+const CACHE_NAME = 'coffre-doux-v26';
 const ASSETS = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', (event) => {
