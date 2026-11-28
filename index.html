@@ -1212,9 +1212,21 @@
     }
 
     function shiftMonth(delta) {
-      state.selectedMonth = shiftMonthString(state.selectedMonth, delta);
+      const currentYm = /^\d{4}-\d{2}$/.test(String(state.selectedMonth || ''))
+        ? state.selectedMonth
+        : getCurrentMonthISO();
+      state.selectedMonth = shiftMonthString(currentYm, delta);
+      state.txFilterCategory = '';
       saveState();
       render();
+    }
+
+    function shiftMonthString(ym, delta) {
+      const parts = String(ym || getCurrentMonthISO()).split('-').map(Number);
+      const y = Number.isFinite(parts[0]) ? parts[0] : new Date().getFullYear();
+      const m = Number.isFinite(parts[1]) ? parts[1] : new Date().getMonth() + 1;
+      const d = new Date(y, m - 1 + Number(delta || 0), 1);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     }
 
     function isScheduledFutureRecurring(tx) {
@@ -1977,7 +1989,7 @@
         : `<div class="ed-card">${renderEmptySeal(hasActiveFilters ? 'Aucun mouvement ne correspond à ce filtre.' : 'Aucun mouvement enregistré sur ce mois.')}</div>`;
 
       return `
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;position:relative;z-index:5;">
           <button type="button" class="icon-btn" onclick="shiftMonth(-1)" aria-label="Mois précédent">‹</button>
           <div class="font-serif-ed" style="font-size:1.2rem;font-weight:500;">${escapeHtml(formatMonthLabel(state.selectedMonth))}</div>
           <button type="button" class="icon-btn" onclick="shiftMonth(1)" aria-label="Mois suivant">›</button>
